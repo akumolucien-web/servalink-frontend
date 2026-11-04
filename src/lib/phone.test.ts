@@ -5,6 +5,7 @@ describe("cameroon phone", () => {
   it.each(["6 77 12 34 56", "+237677123456", "00237677123456", "237-677-123-456", "(677) 12.34.56"])("accepts %s", (raw) => {
     expect(normalizeCmPhone(raw)).toBe("+237677123456");
   });
+  it("treats 9 national digits as national before stripping a 237 prefix", () => expect(normalizeCmPhone("237123456")).toBe("+237237123456"));
   it("accepts landlines starting with 2", () => expect(normalizeCmPhone("222 23 45 67")).toBe("+237222234567"));
   it.each(["12345", "+33612345678", "577123456", "6771234567", ""])("rejects %j", (raw) => {
     expect(normalizeCmPhone(raw)).toBeNull();

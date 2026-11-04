@@ -107,7 +107,7 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
       {actions.map((action) => (
         <Button key={action} size={size} variant={BOOKING_ACTIONS[action].variant} loading={busy === action}
           disabled={busy !== null} onClick={() => run(action)}>
-          {BOOKING_ACTIONS[action].label}
+          {action === "CANCEL" && booking.status !== "PENDING" ? "Cancel booking" : BOOKING_ACTIONS[action].label}
         </Button>
       ))}
       <NoteModal open={asking !== null} tone="danger" title={asking === "PROVIDER_CANCEL" ? "Cancel this job?" : "Cancel this booking?"}

@@ -96,6 +96,9 @@ function Detail({ booking, reload }: { booking: Booking; reload: () => Promise<v
               </div>
             </section>
           )}
+          {!booking.counterparty_phone && ["ACCEPTED", "IN_PROGRESS", "AWAITING_CONFIRMATION", "COMPLETED"].includes(booking.status) && (
+            <p className="muted small">No phone number on file for this person.</p>
+          )}
           {booking.address_details && (
             <section className="card card-pad stack-sm" aria-label="Address">
               <h3 style={{ fontSize: "1rem" }}>{role === "provider" ? "Where to go" : "Your address"}</h3>
