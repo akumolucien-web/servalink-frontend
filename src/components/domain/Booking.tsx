@@ -80,6 +80,7 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
     try {
       await api.bookingAction(booking.booking_id, action, reason);
       toast.success(BOOKING_ACTIONS[action].done);
+      setAsking(null);
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "That didn't work. Try again.");
     } finally {
@@ -97,9 +98,7 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
 
   const submitReason = async (note: string) => {
     if (note.length < 5 || note.length > 300) throw new Error("Give a reason of 5 to 300 characters");
-    const action = asking!;
-    setAsking(null);
-    await send(action, note);
+    await send(asking!, note); // the modal closes only once the API accepted it, so a rejected reason isn't lost
   };
 
   if (!actions.length) return null;

@@ -94,7 +94,7 @@ export function NewBookingPage() {
           </SelectField>
           {other && (
             <TextField label="Your quartier" value={quartier} maxLength={100} error={errors.quartier} disabled={own}
-              onChange={(e) => { setQuartier(e.target.value); setErrors((er) => ({ ...er, quartier: undefined })); }} />
+              onChange={(e) => { setTyping(true); setQuartier(e.target.value); setErrors((er) => ({ ...er, quartier: undefined })); }} />
           )}
           <TextAreaField label="Address and landmark" value={address} error={errors.address} maxLength={300} disabled={own}
             placeholder="e.g. Behind Total Bonamoussadi, blue gate, 2nd floor"

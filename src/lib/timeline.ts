@@ -17,7 +17,7 @@ const NORMAL: BookingStatus[] = ["PENDING", "ACCEPTED", "IN_PROGRESS", "AWAITING
  * REJECTED / CANCELLED are terminal and show no future steps.
  */
 function cancelCopy({ cancelled_by: by, cancel_reason: reason }: Pick<Booking, "cancelled_by" | "cancel_reason">, role: "citizen" | "provider") {
-  if (by === "PROVIDER") return role === "citizen" ? `The provider cancelled: ${reason}` : `You cancelled: ${reason}`;
+  if (by === "PROVIDER") return role === "citizen" ? `The provider cancelled: ${reason || "no reason given"}` : `You cancelled: ${reason || "no reason given"}`;
   if (by === "CITIZEN") return role === "citizen" ? "You cancelled this booking." : `The customer cancelled: ${reason || "no reason given"}`;
   return role === "citizen" ? "You cancelled this request." : "The customer cancelled this request.";
 }

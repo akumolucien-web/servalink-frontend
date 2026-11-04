@@ -274,7 +274,7 @@ async function main() {
       await page.getByLabel("Date and time").fill(futureDate(3));
       await page.getByLabel("Describe the job").fill("Kitchen pipe under the sink is leaking.");
       await page.getByRole("button", { name: "Send booking request" }).click();
-      await page.getByText("Select or type your quartier").waitFor(); // quartier + address are required
+      await page.getByText("Describe where to come").waitFor(); // address is required (quartier is prefilled from the profile)
       await page.getByLabel("Quartier", { exact: true }).selectOption("Molyko");
       await page.getByLabel("Address and landmark").fill("Behind Total Molyko, blue gate, 2nd floor");
       await shot(page, "w-06-booking-form");

@@ -36,6 +36,11 @@ describe("cancelled timeline", () => {
     expect(last(byProvider, "citizen")).toBe("The provider cancelled: Truck broke down");
     expect(last(byProvider, "provider")).toBe("You cancelled: Truck broke down");
   });
+  it("provider cancel without a reason never prints undefined", () => {
+    const bare = b("CANCELLED", { cancelled_by: "PROVIDER" });
+    expect(last(bare, "citizen")).toBe("The provider cancelled: no reason given");
+    expect(last(bare, "provider")).toBe("You cancelled: no reason given");
+  });
   it("citizen cancel", () => {
     expect(last(byCitizen, "citizen")).toBe("You cancelled this booking.");
     expect(last(byCitizen, "provider")).toBe("The customer cancelled: Found someone else");
