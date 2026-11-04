@@ -62,11 +62,11 @@ for (const mobile of [false, true]) {
     await page.getByText("Recent booking requests").waitFor({ timeout: 30000 });
     await ctx.close();
   });
-  await check(`[${tag}] admin links opened by non-admins show 'Admin access only' and no admin data`, async () => {
+  await check(`[${tag}] admin links opened by non-admins redirect to /app with no admin data`, async () => {
     const ctx = await mk();
     for (const [user, path] of [["citizen", `/admin/reports/${state.report_id}`], ["provider", `/admin/providers/${state.provider_id}`]]) {
       const page = await openAs(ctx, user, path);
-      await page.getByText("Admin access only").waitFor({ timeout: 30000 });
+      await page.waitForURL((u) => new URL(u).pathname === "/app", { timeout: 30000 });
       if ((await page.content()).includes("E2E test report")) throw new Error("admin data leaked");
       await page.evaluate(() => localStorage.clear()); await page.close();
     }

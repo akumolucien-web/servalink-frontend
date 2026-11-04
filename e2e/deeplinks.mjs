@@ -208,11 +208,11 @@ await step("the wrong person gets a clear refusal, not another person's data", a
   assert(!(await page.content()).includes("Pipe under the sink"), "another user's booking message leaked");
   await page.evaluate(() => localStorage.clear()); await page.close();
   page = await opensExactly(ctx, L.adminReport, "marie@dl.test");           // a citizen opening an admin link
-  await page.getByText("Admin access only").waitFor();
+  await page.waitForURL((u) => new URL(u).pathname === "/app"); // silently sent to their dashboard
   assert(!(await page.content()).includes("Grout left uneven"), "admin data leaked to a citizen");
   await page.evaluate(() => localStorage.clear()); await page.close();
   page = await opensExactly(ctx, L.adminProvider, "lucien@dl.test");        // even an approved provider
-  await page.getByText("Admin access only").waitFor();
+  await page.waitForURL((u) => new URL(u).pathname === "/app"); // silently sent to their dashboard
   await page.evaluate(() => localStorage.clear()); await page.close();
   page = await opensExactly(ctx, L.citizenReport, "samuel@dl.test");        // someone else's report
   await page.getByText("We couldn't find that report").waitFor();

@@ -18,6 +18,16 @@ export function safeNext(value: string | null | undefined, fallback: string): st
   return value;
 }
 
+/**
+ * Post-login destination for this account: a safe ?next=, except that non-admins are never sent into
+ * /admin (a ?next= left behind by someone else's logout must not reveal the admin area).
+ */
+export function landingAfterLogin(next: string | null | undefined, isAdmin: boolean): string {
+  const home = isAdmin ? "/admin" : "/app";
+  const target = safeNext(next, home);
+  return !isAdmin && /^\/admin(?:[/?#]|$)/.test(target) ? home : target;
+}
+
 /** Appends ?next= (already validated) to an auth-flow URL. */
 export function withNext(path: string, next: string | null | undefined): string {
   const safe = safeNext(next, "");

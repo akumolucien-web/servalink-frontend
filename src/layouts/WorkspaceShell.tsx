@@ -50,7 +50,10 @@ function UserMenu() {
         <div className="popover" style={{ width: 260 }}>
           <div className="head"><div>{displayName}</div><div className="muted xs" style={{ fontWeight: 400 }}>{session?.email}</div></div>
           <Link className="item" to="/app/profile" onClick={() => setOpen(false)}>My profile</Link>
-          <button className="item" onClick={async () => { setOpen(false); await signOut(); navigate("/", { replace: true }); }}>
+          <button className="item" onClick={async () => {
+            // Leave the protected page first: signing out while still on it makes RequireAuth record it as ?next=.
+            setOpen(false); navigate("/", { replace: true }); await signOut();
+          }}>
             <span className="row" style={{ gap: 8 }}><LogOut size={16} aria-hidden="true" />Log out</span>
           </button>
         </div>

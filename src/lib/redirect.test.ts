@@ -1,5 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { safeNext, withNext } from "./redirect";
+import { landingAfterLogin, safeNext, withNext } from "./redirect";
+
+describe("landingAfterLogin (role-aware destination)", () => {
+  it("never sends a non-admin into the admin area (e.g. ?next= left by an admin's logout)", () => {
+    for (const next of ["/admin", "/admin/providers/p1", "/admin?x=1"]) {
+      expect(landingAfterLogin(next, false)).toBe("/app");
+    }
+    expect(landingAfterLogin("/administrator-guide", false)).toBe("/administrator-guide");
+  });
+
+  it("keeps admin links for admins and app links for citizens", () => {
+    expect(landingAfterLogin("/admin/reports/r1", true)).toBe("/admin/reports/r1");
+    expect(landingAfterLogin("/app/bookings/b1", false)).toBe("/app/bookings/b1");
+    expect(landingAfterLogin(null, true)).toBe("/admin");
+    expect(landingAfterLogin("https://evil.test", false)).toBe("/app");
+  });
+});
 
 describe("safeNext (post-login destination)", () => {
   it.each([

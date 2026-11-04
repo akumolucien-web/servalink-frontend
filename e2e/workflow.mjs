@@ -166,7 +166,7 @@ async function main() {
       await lucien.page.goto(`${APP}/app/provider/services`);
       await lucien.page.getByText("Provider Tools are locked").waitFor();
       await marie.page.goto(`${APP}/admin`);
-      await marie.page.getByText("Admin access only").waitFor();
+      await marie.page.waitForURL((u) => new URL(u).pathname === "/app");
     });
 
     await step("citizen A applies to become a provider and requests a new category", async () => {
@@ -422,7 +422,7 @@ async function main() {
       await marie.page.goto(`${APP}/app/provider/bookings`);
       await marie.page.getByText("Provider Tools are locked").waitFor();
       await marie.page.goto(`${APP}/admin/providers`);
-      await marie.page.getByText("Admin access only").waitFor();
+      await marie.page.waitForURL((u) => new URL(u).pathname === "/app");
     });
 
     await step("notification bell lists real work (provider: nothing pending; citizen: nothing) ", async () => {

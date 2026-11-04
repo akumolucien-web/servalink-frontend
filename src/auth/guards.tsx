@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ButtonLink, Button } from "../components/ui/Button";
 import { EmptyState, Skeleton } from "../components/ui/Display";
 import { useToast } from "../components/ui/Overlay";
-import { safeNext } from "../lib/redirect";
+import { landingAfterLogin } from "../lib/redirect";
 import { useAuth } from "./AuthContext";
 
 export function FullPageLoading() {
@@ -41,17 +41,10 @@ export function RequireProfile() {
   return <Outlet />;
 }
 
+/** Non-admins are sent to their dashboard without any hint that an admin area exists (the API enforces it too). */
 export function RequireAdmin() {
   const { isAdmin } = useAuth();
-  if (!isAdmin) {
-    return (
-      <EmptyState icon={<Lock size={24} />} title="Admin access only"
-        action={<ButtonLink to="/app" variant="secondary">Back to my dashboard</ButtonLink>}>
-        Your account doesn't have administrator access. Authorization is also enforced on the server.
-      </EmptyState>
-    );
-  }
-  return <Outlet />;
+  return isAdmin ? <Outlet /> : <Navigate to="/app" replace />;
 }
 
 export function GuestOnly() {
@@ -60,7 +53,7 @@ export function GuestOnly() {
   if (status === "loading") return <FullPageLoading />;
   if (status === "authenticated") {
     const next = new URLSearchParams(location.search).get("next");
-    return <Navigate to={safeNext(next, isAdmin ? "/admin" : "/app")} replace />;
+    return <Navigate to={landingAfterLogin(next, isAdmin)} replace />;
   }
   return <Outlet />;
 }
