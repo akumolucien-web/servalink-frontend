@@ -1,0 +1,1039 @@
+{
+  "version": "2026-11-04",
+  "country": "CM",
+  "regions": [
+    {
+      "id": "AD",
+      "name_en": "Adamawa",
+      "name_fr": "Adamaoua",
+      "capital": "Ngaoundéré",
+      "cities": [
+        {
+          "name": "Ngaoundéré",
+          "quartiers": [
+            "Tongo",
+            "Baladji I",
+            "Baladji II",
+            "Joli Soir",
+            "Abattoir",
+            "Aéroport",
+            "Lamidat",
+            "Yarbang",
+            "Haoussa",
+            "Aoudi",
+            "Sabongari",
+            "Troua Malla",
+            "Mbibar",
+            "Mabanga",
+            "Madagascar",
+            "Mbideng",
+            "Burkina",
+            "Gambara II",
+            "Haut-Plateau",
+            "Camp Fonctionnaire",
+            "Mission Catholique",
+            "Bamyanga"
+          ]
+        },
+        {
+          "name": "Tibati",
+          "quartiers": []
+        },
+        {
+          "name": "Tignère",
+          "quartiers": []
+        },
+        {
+          "name": "Banyo",
+          "quartiers": []
+        },
+        {
+          "name": "Meiganga",
+          "quartiers": []
+        },
+        {
+          "name": "Ngaoundal",
+          "quartiers": []
+        },
+        {
+          "name": "Kontcha",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "CE",
+      "name_en": "Centre",
+      "name_fr": "Centre",
+      "capital": "Yaoundé",
+      "cities": [
+        {
+          "name": "Yaoundé",
+          "quartiers": [
+            "Nlongkak",
+            "Tsinga",
+            "Efoulan",
+            "Kondengui",
+            "Essos",
+            "Biyem-Assi",
+            "Nkolbisson",
+            "Anguissa",
+            "Bastos",
+            "Briqueterie",
+            "Camp SIC Hippodrome",
+            "Elig Edzoa",
+            "Etoudi",
+            "Bata-Nlongkak",
+            "Koweït City",
+            "Mimboman",
+            "Madagascar",
+            "Mendong",
+            "Mokolo",
+            "Ngousso",
+            "Obili",
+            "Omnisports",
+            "Santa Barbara",
+            "Emana",
+            "Camp Sonel",
+            "Etoa-Meki",
+            "Mvog-Atangana-Mballa",
+            "Mvog-Betsi",
+            "Mvog-Mbi",
+            "Olembé",
+            "Olezoa",
+            "Ekounou",
+            "Elig-Essono",
+            "Ekoudou",
+            "Mvan",
+            "Etoug-Ebe",
+            "Melen",
+            "Mini-Ferme",
+            "Cité Verte",
+            "Oyom-Abang",
+            "Nyom",
+            "Simbock",
+            "Ngoa-Ekélé",
+            "Mvolyé",
+            "Damas",
+            "Obobogo",
+            "Tam-Tam Weekend",
+            "Maison Blanche",
+            "Nsimeyong",
+            "Nkom-Kana",
+            "Carrière",
+            "Mvog-Ada",
+            "Odza",
+            "Mbankolo",
+            "Jean-Vespa",
+            "Mballa II",
+            "Tongolo",
+            "Nkol-Ewoue",
+            "Nkolndongo",
+            "Eleveur",
+            "Messa",
+            "Nkomo",
+            "Emombo",
+            "Biteng",
+            "Fouda",
+            "Messassi",
+            "Nkozoa"
+          ]
+        },
+        {
+          "name": "Nanga-Eboko",
+          "quartiers": []
+        },
+        {
+          "name": "Monatélé",
+          "quartiers": []
+        },
+        {
+          "name": "Bafia",
+          "quartiers": []
+        },
+        {
+          "name": "Ntui",
+          "quartiers": []
+        },
+        {
+          "name": "Mfou",
+          "quartiers": []
+        },
+        {
+          "name": "Ngoumou",
+          "quartiers": []
+        },
+        {
+          "name": "Eséka",
+          "quartiers": []
+        },
+        {
+          "name": "Akonolinga",
+          "quartiers": []
+        },
+        {
+          "name": "Mbalmayo",
+          "quartiers": []
+        },
+        {
+          "name": "Obala",
+          "quartiers": []
+        },
+        {
+          "name": "Okola",
+          "quartiers": []
+        },
+        {
+          "name": "Saa",
+          "quartiers": []
+        },
+        {
+          "name": "Mbankomo",
+          "quartiers": []
+        },
+        {
+          "name": "Ayos",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "EN",
+      "name_en": "Far North",
+      "name_fr": "Extrême-Nord",
+      "capital": "Maroua",
+      "cities": [
+        {
+          "name": "Maroua",
+          "quartiers": [
+            "Maoundiwo",
+            "Hardé",
+            "Domayo",
+            "Douggoï",
+            "Doursoungo",
+            "Kongola",
+            "Doualaré",
+            "Founangué",
+            "Diguirwo",
+            "Djarengol",
+            "Baoliwol",
+            "Koutbawo",
+            "Palar",
+            "Zileng",
+            "Ouro Tchédé",
+            "Zokok",
+            "Kakataré",
+            "Barmaré",
+            "Lopéré",
+            "Pitoaré",
+            "Ponré",
+            "Louguéwo",
+            "Patchiguinari",
+            "Congoré",
+            "Djoudandou",
+            "Mayel-Ibbé",
+            "Bamaré"
+          ]
+        },
+        {
+          "name": "Kousséri",
+          "quartiers": []
+        },
+        {
+          "name": "Yagoua",
+          "quartiers": []
+        },
+        {
+          "name": "Kaélé",
+          "quartiers": []
+        },
+        {
+          "name": "Mora",
+          "quartiers": []
+        },
+        {
+          "name": "Mokolo",
+          "quartiers": []
+        },
+        {
+          "name": "Bogo",
+          "quartiers": []
+        },
+        {
+          "name": "Mindif",
+          "quartiers": []
+        },
+        {
+          "name": "Guidiguis",
+          "quartiers": []
+        },
+        {
+          "name": "Kolofata",
+          "quartiers": []
+        },
+        {
+          "name": "Tokombéré",
+          "quartiers": []
+        },
+        {
+          "name": "Maga",
+          "quartiers": []
+        },
+        {
+          "name": "Waza",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "ES",
+      "name_en": "East",
+      "name_fr": "Est",
+      "capital": "Bertoua",
+      "cities": [
+        {
+          "name": "Bertoua",
+          "quartiers": [
+            "Mokolo I",
+            "Mokolo II",
+            "Mokolo III",
+            "Mokolo IV",
+            "Nkolbikon I",
+            "Nkolbikon II",
+            "Madagascar",
+            "Radio",
+            "Sembé",
+            "Ndouan",
+            "Birpondo",
+            "Bodomo",
+            "Bamvélé",
+            "Koumé",
+            "Bonis",
+            "Nganké",
+            "Kaïgama",
+            "Briqueterie",
+            "Haoussa",
+            "Kano",
+            "Elevage",
+            "Enia I",
+            "Enia II",
+            "Ngaïkada",
+            "Tindamba",
+            "Yademé"
+          ]
+        },
+        {
+          "name": "Yokadouma",
+          "quartiers": []
+        },
+        {
+          "name": "Abong-Mbang",
+          "quartiers": []
+        },
+        {
+          "name": "Batouri",
+          "quartiers": []
+        },
+        {
+          "name": "Garoua-Boulaï",
+          "quartiers": []
+        },
+        {
+          "name": "Belabo",
+          "quartiers": []
+        },
+        {
+          "name": "Lomié",
+          "quartiers": []
+        },
+        {
+          "name": "Moloundou",
+          "quartiers": []
+        },
+        {
+          "name": "Betaré-Oya",
+          "quartiers": []
+        },
+        {
+          "name": "Mbang",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "LT",
+      "name_en": "Littoral",
+      "name_fr": "Littoral",
+      "capital": "Douala",
+      "cities": [
+        {
+          "name": "Douala",
+          "quartiers": [
+            "Akwa",
+            "Akwa Nord",
+            "Bonanjo",
+            "Bonapriso",
+            "Bali",
+            "Deïdo",
+            "Bonadoumbé",
+            "Bessengue",
+            "Koumassi",
+            "Ngodi",
+            "New Bell",
+            "Babylone",
+            "Kassalafam",
+            "Nkololoun",
+            "Youpwé",
+            "Sabenjongo",
+            "Mbam Ewondo",
+            "Logbaba",
+            "Ndokoti",
+            "Bépanda",
+            "Boko",
+            "Dibom",
+            "Japoma",
+            "Logbessou",
+            "Madagascar",
+            "Ndogbati",
+            "Ndogbong",
+            "Nylon",
+            "Tergal",
+            "Bassa",
+            "Ndogpassi",
+            "Ngodi Bakoko",
+            "Bonabéri",
+            "Bonassama",
+            "Ndobo",
+            "Ngwélé",
+            "Mambanda",
+            "Bonambappé",
+            "Bonamoussadi",
+            "Makepe",
+            "Maképé-Missoké",
+            "Bangué",
+            "Kotto",
+            "Logpom",
+            "Cité des Palmiers",
+            "Cité Sic",
+            "Mbengue City",
+            "Sobikago",
+            "Bonamoussongo",
+            "PK 12",
+            "Cap Cameroun",
+            "Manoka",
+            "Bakwat",
+            "Dahomey",
+            "Ndogsimbi",
+            "Brazzaville",
+            "Madiba",
+            "Oyack"
+          ]
+        },
+        {
+          "name": "Nkongsamba",
+          "quartiers": [
+            "Barehock",
+            "Ekanbeng",
+            "Essel",
+            "Eboum",
+            "Mbaressoumtou",
+            "Mouandja",
+            "Nlonko'o",
+            "Ekel-Ko'o",
+            "Edip",
+            "Ngalmoa",
+            "Badjoki",
+            "Sosso",
+            "Bonangoh",
+            "Baré",
+            "Ekangté"
+          ]
+        },
+        {
+          "name": "Yabassi",
+          "quartiers": []
+        },
+        {
+          "name": "Edéa",
+          "quartiers": [
+            "Abbe",
+            "Appouh",
+            "Batombé",
+            "Dehane",
+            "Ekite",
+            "Malimba",
+            "Mpombo",
+            "Ndogbiang",
+            "Ngonga",
+            "Pout-Loloma",
+            "Lom Edéa"
+          ]
+        },
+        {
+          "name": "Loum",
+          "quartiers": []
+        },
+        {
+          "name": "Mbanga",
+          "quartiers": []
+        },
+        {
+          "name": "Penja",
+          "quartiers": []
+        },
+        {
+          "name": "Manjo",
+          "quartiers": []
+        },
+        {
+          "name": "Melong",
+          "quartiers": []
+        },
+        {
+          "name": "Dibombari",
+          "quartiers": []
+        },
+        {
+          "name": "Souza",
+          "quartiers": []
+        },
+        {
+          "name": "Njombé",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "NO",
+      "name_en": "North",
+      "name_fr": "Nord",
+      "capital": "Garoua",
+      "cities": [
+        {
+          "name": "Garoua",
+          "quartiers": [
+            "Roumdé Adjia",
+            "Poumpoumré",
+            "Marouaré",
+            "Lopéré",
+            "Yelwa",
+            "Demsaré",
+            "Laïndé",
+            "Foulbéré",
+            "Bibémiré",
+            "Haoussaré",
+            "Souari",
+            "Ouro Hourso",
+            "Kismatari",
+            "Plateau",
+            "Tchakamidari",
+            "Centre Commercial"
+          ]
+        },
+        {
+          "name": "Poli",
+          "quartiers": []
+        },
+        {
+          "name": "Guider",
+          "quartiers": []
+        },
+        {
+          "name": "Tcholliré",
+          "quartiers": []
+        },
+        {
+          "name": "Figuil",
+          "quartiers": []
+        },
+        {
+          "name": "Pitoa",
+          "quartiers": []
+        },
+        {
+          "name": "Bibemi",
+          "quartiers": []
+        },
+        {
+          "name": "Touboro",
+          "quartiers": []
+        },
+        {
+          "name": "Rey-Bouba",
+          "quartiers": []
+        },
+        {
+          "name": "Lagdo",
+          "quartiers": []
+        },
+        {
+          "name": "Mayo-Oulo",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "NW",
+      "name_en": "North-West",
+      "name_fr": "Nord-Ouest",
+      "capital": "Bamenda",
+      "cities": [
+        {
+          "name": "Bamenda",
+          "quartiers": [
+            "Ntafebuh",
+            "Kenelari",
+            "Menda-Nkwe",
+            "Mbatu",
+            "Ntamafe",
+            "Ntankah",
+            "Mbefi",
+            "Mubang",
+            "Ntasen",
+            "Nkwenjang",
+            "Ntahkekah",
+            "Alabukom",
+            "Alachu",
+            "Futru",
+            "Mbelem",
+            "Bayelle Manda",
+            "Ntumbong",
+            "Chomba",
+            "Ntambeng"
+          ]
+        },
+        {
+          "name": "Fundong",
+          "quartiers": []
+        },
+        {
+          "name": "Kumbo",
+          "quartiers": []
+        },
+        {
+          "name": "Nkambé",
+          "quartiers": []
+        },
+        {
+          "name": "Wum",
+          "quartiers": []
+        },
+        {
+          "name": "Mbengwi",
+          "quartiers": []
+        },
+        {
+          "name": "Ndop",
+          "quartiers": []
+        },
+        {
+          "name": "Bafut",
+          "quartiers": []
+        },
+        {
+          "name": "Ndu",
+          "quartiers": []
+        },
+        {
+          "name": "Jakiri",
+          "quartiers": []
+        },
+        {
+          "name": "Batibo",
+          "quartiers": []
+        },
+        {
+          "name": "Widikum",
+          "quartiers": []
+        },
+        {
+          "name": "Bali",
+          "quartiers": []
+        },
+        {
+          "name": "Santa",
+          "quartiers": []
+        },
+        {
+          "name": "Tubah",
+          "quartiers": []
+        },
+        {
+          "name": "Nwa",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "OU",
+      "name_en": "West",
+      "name_fr": "Ouest",
+      "capital": "Bafoussam",
+      "cities": [
+        {
+          "name": "Bafoussam",
+          "quartiers": [
+            "Bamendzi",
+            "Banengo",
+            "Djeleng",
+            "Demsiem",
+            "Évêché",
+            "Famla",
+            "Gouache",
+            "Haoussa",
+            "Lemgwo",
+            "Hélak",
+            "Kamkop",
+            "Kena",
+            "Keuleu",
+            "Kouogouo",
+            "Metto",
+            "Ndianso",
+            "Ndiandam",
+            "Nylon",
+            "Sachiè",
+            "Tamdja",
+            "Toket",
+            "Toungang",
+            "Touhenyee",
+            "Tyo",
+            "Yanmbah"
+          ]
+        },
+        {
+          "name": "Mbouda",
+          "quartiers": []
+        },
+        {
+          "name": "Bafang",
+          "quartiers": []
+        },
+        {
+          "name": "Baham",
+          "quartiers": []
+        },
+        {
+          "name": "Bandjoun",
+          "quartiers": []
+        },
+        {
+          "name": "Dschang",
+          "quartiers": [
+            "Asseitsa",
+            "Athoumeto",
+            "Aza'a",
+            "Canne à Sucre",
+            "Centre Commercial",
+            "Dounga",
+            "Famla",
+            "Femteu",
+            "Fiankop",
+            "Génie Rural",
+            "Haoussa",
+            "Keuleng",
+            "Leufock",
+            "Makemtsa",
+            "Mechieu",
+            "Melang",
+            "Mingmeto",
+            "Mingou",
+            "Ngui",
+            "Nylon",
+            "Tapalé",
+            "Tchoualé",
+            "Tsenfem",
+            "Tsinbing",
+            "Tsinkop",
+            "Zemda"
+          ]
+        },
+        {
+          "name": "Bangangté",
+          "quartiers": []
+        },
+        {
+          "name": "Foumban",
+          "quartiers": [
+            "Koundoumbain",
+            "Kounga",
+            "Machinka",
+            "Malatam",
+            "Manga I",
+            "Manga II",
+            "Manga III",
+            "Manka",
+            "Matoumbain",
+            "Njiloum",
+            "Njimbam",
+            "Njindare",
+            "Njissamtouem",
+            "Njissé",
+            "Njitout",
+            "Nkoudounka",
+            "Palais",
+            "Koukouet-Maloum"
+          ]
+        },
+        {
+          "name": "Kékem",
+          "quartiers": []
+        },
+        {
+          "name": "Bangou",
+          "quartiers": []
+        },
+        {
+          "name": "Foumbot",
+          "quartiers": []
+        },
+        {
+          "name": "Galim",
+          "quartiers": []
+        },
+        {
+          "name": "Massangam",
+          "quartiers": []
+        },
+        {
+          "name": "Penka-Michel",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "SU",
+      "name_en": "South",
+      "name_fr": "Sud",
+      "capital": "Ebolowa",
+      "cities": [
+        {
+          "name": "Ebolowa",
+          "quartiers": [
+            "Abang",
+            "Nko'ovos I",
+            "Nko'ovos II",
+            "New-Bell",
+            "Ngalane",
+            "Angounou",
+            "Mekalat",
+            "Angalé",
+            "Ebolowa-Si",
+            "Melate",
+            "Engom",
+            "Mefak",
+            "Lotissement John Holt"
+          ]
+        },
+        {
+          "name": "Sangmélima",
+          "quartiers": []
+        },
+        {
+          "name": "Ambam",
+          "quartiers": []
+        },
+        {
+          "name": "Kribi",
+          "quartiers": [
+            "Massaka",
+            "Dombé",
+            "Mpolongwé",
+            "Talla",
+            "Mboamanga",
+            "Ngoyé",
+            "Petit-Paris",
+            "Mokolo",
+            "Zaïre",
+            "New-Town",
+            "Elabé",
+            "Afan-Mabé",
+            "Lolabé",
+            "Londji",
+            "Eboundja",
+            "Bikondo"
+          ]
+        },
+        {
+          "name": "Djoum",
+          "quartiers": []
+        },
+        {
+          "name": "Campo",
+          "quartiers": []
+        },
+        {
+          "name": "Lolodorf",
+          "quartiers": []
+        },
+        {
+          "name": "Bipindi",
+          "quartiers": []
+        },
+        {
+          "name": "Zoétélé",
+          "quartiers": []
+        },
+        {
+          "name": "Meyomessala",
+          "quartiers": []
+        },
+        {
+          "name": "Mintom",
+          "quartiers": []
+        },
+        {
+          "name": "Ma'an",
+          "quartiers": []
+        }
+      ]
+    },
+    {
+      "id": "SW",
+      "name_en": "South-West",
+      "name_fr": "Sud-Ouest",
+      "capital": "Buea",
+      "cities": [
+        {
+          "name": "Buea",
+          "quartiers": [
+            "Molyko",
+            "Great Soppo",
+            "Small Soppo",
+            "Muea",
+            "Buéa Station",
+            "Bokwaongo",
+            "Bonduma",
+            "Bonakanda",
+            "Clerk's Quarter",
+            "Federal Quarters",
+            "Government Residential Area",
+            "Mokunda",
+            "Old Government Station",
+            "Bulu",
+            "Bokoko",
+            "Bova",
+            "Bwassa",
+            "Lower Bolifamba",
+            "Dibanda",
+            "Bonjongo"
+          ]
+        },
+        {
+          "name": "Limbé",
+          "quartiers": [
+            "Bonadikombo",
+            "Batoke",
+            "Bota Land",
+            "Mokindi",
+            "Mbonjo",
+            "Mabeta",
+            "Mondoli",
+            "Bobende",
+            "Ngeme",
+            "Wovia"
+          ]
+        },
+        {
+          "name": "Bangem",
+          "quartiers": []
+        },
+        {
+          "name": "Menji",
+          "quartiers": []
+        },
+        {
+          "name": "Mamfé",
+          "quartiers": []
+        },
+        {
+          "name": "Kumba",
+          "quartiers": [
+            "Monte Carlo",
+            "Diffac",
+            "Teke",
+            "Mambanda",
+            "Mukonje",
+            "Tancha",
+            "Malende",
+            "Mundame",
+            "Dschang Quarter",
+            "Quartier Cattle Market",
+            "Barombi Kang",
+            "Puletin",
+            "Utoko",
+            "Makiti",
+            "Fiango"
+          ]
+        },
+        {
+          "name": "Mundemba",
+          "quartiers": []
+        },
+        {
+          "name": "Tiko",
+          "quartiers": []
+        },
+        {
+          "name": "Muyuka",
+          "quartiers": []
+        },
+        {
+          "name": "Idenau",
+          "quartiers": []
+        },
+        {
+          "name": "Mutengene",
+          "quartiers": []
+        },
+        {
+          "name": "Ekondo-Titi",
+          "quartiers": []
+        },
+        {
+          "name": "Fontem",
+          "quartiers": []
+        },
+        {
+          "name": "Akwaya",
+          "quartiers": []
+        },
+        {
+          "name": "Konye",
+          "quartiers": []
+        },
+        {
+          "name": "Bamusso",
+          "quartiers": []
+        }
+      ]
+    }
+  ],
+  "sources": [
+    "https://fr.wikipedia.org/wiki/D%C3%A9partements_du_Cameroun",
+    "https://fr.wikipedia.org/wiki/Douala",
+    "https://fr.wikipedia.org/wiki/Yaound%C3%A9",
+    "https://fr.wikipedia.org/wiki/Ngaound%C3%A9r%C3%A9",
+    "https://fr.wikipedia.org/wiki/Maroua",
+    "https://fr.wikipedia.org/wiki/Bertoua",
+    "https://fr.wikipedia.org/wiki/Garoua",
+    "https://fr.wikipedia.org/wiki/Bamenda",
+    "https://fr.wikipedia.org/wiki/Bafoussam",
+    "https://fr.wikipedia.org/wiki/Ebolowa",
+    "https://fr.wikipedia.org/wiki/Bu%C3%A9a",
+    "https://fr.wikipedia.org/wiki/Limb%C3%A9",
+    "https://fr.wikipedia.org/wiki/Kumba_(Cameroun)",
+    "https://fr.wikipedia.org/wiki/Kribi",
+    "https://fr.wikipedia.org/wiki/Dschang",
+    "https://fr.wikipedia.org/wiki/%C3%89d%C3%A9a",
+    "https://fr.wikipedia.org/wiki/Nkongsamba",
+    "https://fr.wikipedia.org/wiki/Foumban",
+    "https://en.wikipedia.org/wiki/Garoua",
+    "https://es.wikipedia.org/wiki/Garua_(Camer%C3%BAn)",
+    "https://www.osidimbea.cm/collectivites/adamaoua/ngaoundere-1-arr/",
+    "https://www.osidimbea.cm/collectivites/adamaoua/ngaoundere-2-arr/",
+    "https://www.osidimbea.cm/collectivites/est/bertoua-1-arr/",
+    "https://www.osidimbea.cm/collectivites/est/bertoua-2-arr/",
+    "https://www.osidimbea.cm/collectivites/sud/ebolowa-1-commune/",
+    "https://cameroon-tribune.cm/article.html/63996/fr.html/details_2"
+  ]
+}
