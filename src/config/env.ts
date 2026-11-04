@@ -2,7 +2,7 @@ const env = import.meta.env;
 
 export const config = {
   apiBaseUrl: String(env.VITE_API_BASE_URL ?? "").replace(/\/$/, ""),
-  region: String(env.VITE_AWS_REGION ?? "us-east-1"),
+  region: String(env.VITE_AWS_REGION ?? "eu-north-1"),
   userPoolId: String(env.VITE_COGNITO_USER_POOL_ID ?? ""),
   userPoolClientId: String(env.VITE_COGNITO_USER_POOL_CLIENT_ID ?? ""),
 };
