@@ -71,7 +71,10 @@ export interface Service {
   category_name: string;
   name: string;
   description: string;
+  region?: string;
   city: string;
+  price_from?: number | null;
+  price_note?: string;
   status: string;
   provider_name?: string;
   provider_photo_url?: string | null;

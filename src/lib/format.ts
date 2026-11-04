@@ -53,3 +53,9 @@ export function greeting(now = new Date()): string {
 export function plural(count: number, one: string, many = one + "s"): string {
   return `${count} ${count === 1 ? one : many}`;
 }
+
+/** "5 000 FCFA"; a regular space separator (toLocaleString varies by browser). No price means "Price on request". */
+export function formatFcfa(n?: number | null): string {
+  if (n == null) return "Price on request";
+  return `${String(Math.round(n)).replace(/\B(?=(\d{3})+$)/g, " ")} FCFA`;
+}

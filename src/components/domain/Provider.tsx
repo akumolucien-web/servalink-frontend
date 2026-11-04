@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BadgeCheck, ImagePlus, MapPin, X } from "lucide-react";
-import { validateImage, type ProviderCard as ProviderCardData, type Review } from "../../api";
-import { formatDate, plural } from "../../lib/format";
+import { validateImage, type ProviderCard as ProviderCardData, type Review, type Service } from "../../api";
+import { formatDate, formatFcfa, plural } from "../../lib/format";
 import { Button, ButtonLink } from "../ui/Button";
 import { Avatar, RatingChip } from "../ui/Display";
 
@@ -24,6 +24,14 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
       </div>
       <div className="go"><ButtonLink to={`/providers/${provider.provider_id}`}>View Profile</ButtonLink></div>
     </article>
+  );
+}
+
+export function ServicePrice({ service }: { service: Pick<Service, "price_from" | "price_note"> }) {
+  return (
+    <p className="small" style={{ marginTop: 4, fontWeight: 600 }}>
+      {formatFcfa(service.price_from)}{service.price_note && <span className="muted" style={{ fontWeight: 400 }}> · {service.price_note}</span>}
+    </p>
   );
 }
 

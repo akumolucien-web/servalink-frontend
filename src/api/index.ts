@@ -41,9 +41,9 @@ export const api = {
     put<{ provider: ProviderRecord }>("/provider", body).then((r) => r.provider),
   myServices: (providerId: string) =>
     get<{ services: Service[] }>("/services", { ...PUBLIC, query: { provider_id: providerId } }).then((r) => r.services),
-  createService: (body: { category_id: string; city: string; name: string; description: string }) =>
+  createService: (body: { category_id: string; region: string; city: string; name: string; description?: string; price_from?: number | null; price_note?: string }) =>
     post<{ service: Service }>("/services", body).then((r) => r.service),
-  updateService: (id: string, body: { name?: string; description?: string }) =>
+  updateService: (id: string, body: { name?: string; description?: string; price_from?: number | null; price_note?: string }) =>
     put<{ service: Service }>(`/services/${id}`, body).then((r) => r.service),
   deleteService: (id: string) => del<{ message: string }>(`/services/${id}`),
   categoryRequests: () => get<{ requests: CategoryRequest[] }>("/service-category-requests").then((r) => r.requests),

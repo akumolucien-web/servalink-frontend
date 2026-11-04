@@ -7,7 +7,8 @@ import { CategoryIcon } from "../../components/domain/CategoryIcon";
 import { FeaturedProviders } from "../../components/home/FeaturedProviders";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { EmptyState, ErrorState, Skeleton } from "../../components/ui/Display";
-import { TextField, SelectField } from "../../components/ui/Field";
+import { LocationPicker } from "../../components/domain/LocationPicker";
+import { SelectField } from "../../components/ui/Field";
 import { useResource } from "../../lib/useResource";
 
 const STEPS = [
@@ -37,19 +38,20 @@ export function HomePage() {
   const navigate = useNavigate();
   const categories = useResource(() => api.categories(), []);
   const [category, setCategory] = useState("");
-  const [city, setCity] = useState("");
-  const [errors, setErrors] = useState<{ category?: string; city?: string }>({});
+  const [loc, setLoc] = useState({ region: "", city: "", quartier: "" });
+  const [errors, setErrors] = useState<{ category?: string; region?: string; city?: string }>({});
   const list = categories.data ?? [];
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const next = {
       category: category ? undefined : "Choose a category",
-      city: city.trim() ? undefined : "Enter your town or city",
+      region: loc.region ? undefined : "Choose a region",
+      city: loc.city ? undefined : "Choose your town or city",
     };
     setErrors(next);
-    if (next.category || next.city) return;
-    navigate(`/search?category=${encodeURIComponent(category)}&city=${encodeURIComponent(city.trim())}`);
+    if (next.category || next.region || next.city) return;
+    navigate(`/search?category=${encodeURIComponent(category)}&region=${encodeURIComponent(loc.region)}&city=${encodeURIComponent(loc.city)}`);
   };
 
   return (
@@ -64,8 +66,7 @@ export function HomePage() {
               <option value="">{categories.loading ? "Loading categories…" : list.length ? "Choose a category" : "No categories yet"}</option>
               {list.map((c) => <option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
             </SelectField>
-            <TextField label="Town or city" placeholder="e.g. Buea" value={city} error={errors.city}
-              onChange={(e) => setCity(e.target.value)} autoComplete="address-level2" />
+            <LocationPicker level="city" value={loc} onChange={setLoc} errors={errors} />
             <Button type="submit" size="lg" icon={<Search size={18} />}>Find Providers</Button>
           </form>
           <p className="small muted">Free to use. ServaLink does not process payments.</p>

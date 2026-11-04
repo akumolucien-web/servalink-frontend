@@ -21,3 +21,9 @@ export const regionName = (id: string, lang: "en" | "fr" = "en") => {
   const r = REGIONS.find((x) => x.id === id);
   return r ? (lang === "fr" ? r.name_fr : r.name_en) : id;
 };
+
+/** Region id of the first city matching `city` (accent/case-insensitive), or "" when unknown. */
+export const regionOfCity = (city: string) => {
+  const key = fold(city);
+  return key ? REGIONS.find((r) => r.cities.some((c) => fold(c.name) === key))?.id ?? "" : "";
+};

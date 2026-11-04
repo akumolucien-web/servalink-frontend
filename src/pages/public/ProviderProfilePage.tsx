@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Images, MapPin, MessageSquareText, UserX, Wrench } from "lucide-react";
 import { api, ApiError } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
-import { ReviewItem } from "../../components/domain/Provider";
+import { ReviewItem, ServicePrice } from "../../components/domain/Provider";
 import { ButtonLink } from "../../components/ui/Button";
 import { Avatar, Breadcrumbs, CardSkeleton, EmptyState, ErrorState, RatingChip, StatusBadge } from "../../components/ui/Display";
 import { Tabs } from "../../components/ui/Tabs";
@@ -79,6 +79,7 @@ export function ProviderProfilePage() {
                   <h3 style={{ fontSize: "1rem" }}>{service.name}</h3>
                   {service.description && <p className="muted small">{service.description}</p>}
                   <p className="muted xs row" style={{ gap: 4, marginTop: 4 }}><MapPin size={12} aria-hidden="true" />{service.city}</p>
+                  <ServicePrice service={service} />
                 </div>
                 {isOwn
                   ? <StatusBadge label="Your service" tone="slate" dot={false} />

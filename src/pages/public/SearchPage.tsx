@@ -5,8 +5,10 @@ import { api } from "../../api";
 import { ProviderCard } from "../../components/domain/Provider";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
-import { SelectField, TextField } from "../../components/ui/Field";
+import { LocationPicker } from "../../components/domain/LocationPicker";
+import { SelectField } from "../../components/ui/Field";
 import { plural } from "../../lib/format";
+import { regionOfCity } from "../../lib/locations";
 import { ratingRank } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
@@ -18,8 +20,10 @@ export function SearchPage() {
   const city = params.get("city") ?? "";
   const [sort, setSort] = useState<Sort>("rating");
   const [draftCategory, setDraftCategory] = useState(category);
-  const [draftCity, setDraftCity] = useState(city);
-  useEffect(() => { setDraftCategory(category); setDraftCity(city); }, [category, city]);
+  // Old links carry only ?city=; find its region in the dataset so the picker can show it.
+  const region = params.get("region") ?? regionOfCity(city);
+  const [draftLoc, setDraftLoc] = useState({ region, city, quartier: "" });
+  useEffect(() => { setDraftCategory(category); setDraftLoc({ region, city, quartier: "" }); }, [category, region, city]);
 
   const categories = useResource(() => api.categories(), []);
   const results = useResource(() => api.providers({ category, city }), [category, city]);
@@ -37,7 +41,8 @@ export function SearchPage() {
     event.preventDefault();
     const next = new URLSearchParams();
     if (draftCategory) next.set("category", draftCategory);
-    if (draftCity.trim()) next.set("city", draftCity.trim());
+    if (draftLoc.region) next.set("region", draftLoc.region);
+    if (draftLoc.city) next.set("city", draftLoc.city);
     setParams(next);
   };
 
@@ -51,7 +56,7 @@ export function SearchPage() {
           <option value="">All categories</option>
           {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
         </SelectField>
-        <TextField label="Town or city" placeholder="e.g. Buea" value={draftCity} onChange={(e) => setDraftCity(e.target.value)} />
+        <LocationPicker level="city" value={draftLoc} onChange={setDraftLoc} />
         <div style={{ alignSelf: "end" }}><Button type="submit" icon={<Search size={16} />} block>Search</Button></div>
       </form>
 

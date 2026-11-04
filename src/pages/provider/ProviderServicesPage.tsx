@@ -2,10 +2,13 @@ import { useState, type FormEvent } from "react";
 import { MapPin, Pencil, Plus, Trash2, Wrench } from "lucide-react";
 import { api, ApiError, type Service } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
+import { LocationPicker } from "../../components/domain/LocationPicker";
+import { ServicePrice } from "../../components/domain/Provider";
 import { Button } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { hasErrors, SelectField, TextAreaField, TextField, type Errors } from "../../components/ui/Field";
 import { Modal, useConfirm, useToast } from "../../components/ui/Overlay";
+import { regionOfCity } from "../../lib/locations";
 import { useResource } from "../../lib/useResource";
 import { CategoryRequestModal } from "../citizen/BecomeProviderPage";
 
@@ -46,6 +49,7 @@ export function ProviderServicesPage() {
                     <h3 style={{ fontSize: "1rem" }}>{s.name}</h3>
                     {s.description && <p className="muted small">{s.description}</p>}
                     <p className="muted xs row" style={{ gap: 4, marginTop: 4 }}><MapPin size={12} aria-hidden="true" />{s.city} · {s.category_name}</p>
+                    <ServicePrice service={s} />
                   </div>
                   <div className="row" style={{ gap: 8 }}>
                     <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => setEditing(s)}>Edit</Button>
@@ -66,9 +70,10 @@ function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | 
   const categories = useResource(() => api.categories(), []);
   const isNew = target === "new";
   const existing = target && target !== "new" ? target : null;
-  const [form, setForm] = useState({ category_id: "", city: "", name: "", description: "" });
+  const [form, setForm] = useState({ category_id: "", name: "", description: "", price_from: "", price_note: "" });
+  const [loc, setLoc] = useState({ region: "", city: "", quartier: "" });
   const [loadedFor, setLoadedFor] = useState<unknown>(null);
-  const [errors, setErrors] = useState<Errors<"category_id" | "city" | "name" | "form">>({});
+  const [errors, setErrors] = useState<Errors<"category_id" | "region" | "city" | "name" | "price_from" | "form">>({});
   const [busy, setBusy] = useState(false);
   const [requesting, setRequesting] = useState(false);
 
@@ -76,23 +81,32 @@ function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | 
   if (target !== loadedFor) {
     setLoadedFor(target);
     setErrors({});
+    const price = { price_from: existing?.price_from != null ? String(existing.price_from) : "", price_note: existing?.price_note ?? "" };
     setForm(existing
-      ? { category_id: existing.category_id, city: existing.city, name: existing.name, description: existing.description ?? "" }
-      : { category_id: "", city: provider?.city ?? profile?.city ?? "", name: "", description: "" });
+      ? { category_id: existing.category_id, name: existing.name, description: existing.description ?? "", ...price }
+      : { category_id: "", name: "", description: "", ...price });
+    // New services default to the provider's profile region and city.
+    const city = provider?.city ?? profile?.city ?? "";
+    setLoc({ region: profile?.region || regionOfCity(city), city, quartier: "" });
   }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
     if (isNew && !form.category_id) next.category_id = "Choose a category";
-    if (isNew && !form.city.trim()) next.city = "Enter the town you work in";
+    if (isNew && !loc.region) next.region = "Choose a region";
+    if (isNew && !loc.city) next.city = "Choose the town you work in";
     if (!form.name.trim()) next.name = "Enter a service name";
+    const priceText = form.price_from.trim();
+    const price = priceText ? Number(priceText) : null;
+    if (price !== null && !(Number.isInteger(price) && price >= 100 && price <= 10_000_000)) next.price_from = "Enter a whole number between 100 and 10 000 000 FCFA, or leave it empty";
     setErrors(next);
     if (hasErrors(next)) return;
     setBusy(true);
     try {
-      if (existing) await api.updateService(existing.service_id, { name: form.name.trim(), description: form.description.trim() });
-      else await api.createService({ category_id: form.category_id, city: form.city.trim(), name: form.name.trim(), description: form.description.trim() });
+      const body = { name: form.name.trim(), description: form.description.trim(), price_from: price, price_note: form.price_note.trim() };
+      if (existing) await api.updateService(existing.service_id, body);
+      else await api.createService({ category_id: form.category_id, region: loc.region, city: loc.city, ...body });
       toast.success(existing ? "Service updated" : "Service added");
       onSaved(); onClose();
     } catch (error) {
@@ -113,12 +127,15 @@ function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | 
                   {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
                 </SelectField>
                 <p className="small" style={{ marginTop: -8 }}>Missing a category? <button type="button" style={{ background: "none", border: 0, padding: 0, color: "var(--green-700)", fontWeight: 600, textDecoration: "underline" }} onClick={() => setRequesting(true)}>Request one</button></p>
-                <TextField label="Town / city" value={form.city} error={errors.city} hint="Customers search by town." onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                <LocationPicker level="city" value={loc} onChange={setLoc} errors={errors} />
               </>
             )}
             {existing && <p className="hint-box">Category ({existing.category_name}) and town ({existing.city}) can't be changed. Add a new service for another town or category.</p>}
             <TextField label="Service name" placeholder="e.g. Leaking pipe repair" value={form.name} error={errors.name} maxLength={120} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <TextAreaField label="Description" optional value={form.description} maxLength={1000} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <TextField label="Starting price (FCFA)" optional type="number" inputMode="numeric" min={100} max={10000000} step={1} value={form.price_from} error={errors.price_from}
+              hint="Leave empty to show &quot;Price on request&quot;." onChange={(e) => setForm({ ...form, price_from: e.target.value })} />
+            <TextField label="Price note" optional value={form.price_note} maxLength={120} placeholder="e.g. per hour, materials extra" onChange={(e) => setForm({ ...form, price_note: e.target.value })} />
           </div>
           <div className="modal-foot"><Button variant="ghost" onClick={onClose}>Cancel</Button><Button type="submit" loading={busy}>{existing ? "Save changes" : "Add service"}</Button></div>
         </form>

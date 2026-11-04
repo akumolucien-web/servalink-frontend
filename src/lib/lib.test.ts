@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatBookingDate, initials, nextHourLocal } from "./format";
+import { formatBookingDate, formatFcfa, initials, nextHourLocal } from "./format";
 import { RATING_LABEL, ratingRank } from "./status";
 import { buildTimeline } from "./timeline";
 
@@ -49,5 +49,17 @@ describe("labels and formatting", () => {
   it("derives initials", () => {
     expect(initials("Marie Kamga")).toBe("MK");
     expect(initials("")).toBe("?");
+  });
+});
+
+describe("formatFcfa", () => {
+  it("groups thousands with a regular space", () => {
+    expect(formatFcfa(5000)).toBe("5 000 FCFA");
+    expect(formatFcfa(1250000)).toBe("1 250 000 FCFA");
+  });
+
+  it("says price on request when there is no price", () => {
+    expect(formatFcfa(null)).toBe("Price on request");
+    expect(formatFcfa(undefined)).toBe("Price on request");
   });
 });
