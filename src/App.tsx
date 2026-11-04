@@ -34,7 +34,9 @@ import { ProviderServicesPage } from "./pages/provider/ProviderServicesPage";
 import { BecomeProviderInfoPage } from "./pages/public/BecomeProviderInfoPage";
 import { HomePage } from "./pages/public/HomePage";
 import { ProviderProfilePage } from "./pages/public/ProviderProfilePage";
+import { PrivacyPage } from "./pages/public/PrivacyPage";
 import { SearchPage } from "./pages/public/SearchPage";
+import { TermsPage } from "./pages/public/TermsPage";
 
 /** Scroll to top on navigation, or to the #anchor (How it works / About). */
 function ScrollManager() {
@@ -59,6 +61,8 @@ export default function App() {
         <Route element={<PublicShell />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/become-provider" element={<BecomeProviderInfoPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Route>
 
         <Route element={<AdaptiveShell />}>

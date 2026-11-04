@@ -69,6 +69,8 @@ export function Footer() {
           <Link to="/login">Log in</Link>
           <Link to="/register">Create account</Link>
           <Link to="/#about">About ServaLink</Link>
+          <Link to="/terms">Terms and Conditions</Link>
+          <Link to="/privacy">Privacy notice</Link>
         </div>
         <p className="legal">ServaLink does not process payments. Agree on the work directly with your provider.</p>
       </div>

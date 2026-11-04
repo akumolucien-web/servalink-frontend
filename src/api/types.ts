@@ -22,8 +22,12 @@ export interface Profile {
   email: string;
   full_name: string;
   city: string;
+  region?: string;
+  quartier?: string;
   phone: string;
   profile_image_key: string | null;
+  terms_accepted_at?: string;
+  terms_version?: string;
   created_at?: string;
   updated_at?: string;
 }

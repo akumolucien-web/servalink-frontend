@@ -7,7 +7,7 @@ import { createAmplifyAdapter } from "./amplifyAdapter";
 
 type Status = "loading" | "anonymous" | "authenticated";
 
-interface PendingProfile { email: string; full_name: string; city: string; phone: string }
+interface PendingProfile { email: string; full_name: string; region: string; city: string; phone: string }
 const PENDING_KEY = "servalink.pendingProfile";
 
 export function rememberPendingProfile(profile: PendingProfile) {
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const pending = takePendingProfile(current.email);
         if (pending) {
           try {
-            finalProfile = await api.saveProfile({ full_name: pending.full_name, city: pending.city, phone: pending.phone });
+            finalProfile = await api.saveProfile({ full_name: pending.full_name, region: pending.region, city: pending.city, phone: pending.phone, accept_terms: true }); // consent line shown under "Create Account"
           } catch { finalProfile = null; }
         }
       }
