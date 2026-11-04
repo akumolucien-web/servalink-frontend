@@ -16,7 +16,13 @@ const NORMAL: BookingStatus[] = ["PENDING", "ACCEPTED", "IN_PROGRESS", "AWAITING
  * Builds the timeline purely from booking.status. The frontend never advances status.
  * REJECTED / CANCELLED are terminal and show no future steps.
  */
-export function buildTimeline(booking: Pick<Booking, "status" | "created_at" | "updated_at">, role: "citizen" | "provider"): TimelineStep[] {
+function cancelCopy({ cancelled_by: by, cancel_reason: reason }: Pick<Booking, "cancelled_by" | "cancel_reason">, role: "citizen" | "provider") {
+  if (by === "PROVIDER") return role === "citizen" ? `The provider cancelled: ${reason}` : `You cancelled: ${reason}`;
+  if (by === "CITIZEN") return role === "citizen" ? "You cancelled this booking." : `The customer cancelled: ${reason || "no reason given"}`;
+  return role === "citizen" ? "You cancelled this request." : "The customer cancelled this request.";
+}
+
+export function buildTimeline(booking: Pick<Booking, "status" | "created_at" | "updated_at" | "cancelled_by" | "cancel_reason">, role: "citizen" | "provider"): TimelineStep[] {
   const first: TimelineStep = {
     key: "PENDING",
     title: role === "citizen" ? "Request sent" : "Request received",
@@ -32,7 +38,7 @@ export function buildTimeline(booking: Pick<Booking, "status" | "created_at" | "
       title: rejected ? "Rejected" : "Cancelled",
       description: rejected
         ? (role === "citizen" ? "The provider declined this request." : "You declined this request.")
-        : (role === "citizen" ? "You cancelled this request." : "The customer cancelled this request."),
+        : cancelCopy(booking, role),
       state: "bad",
       time: booking.updated_at,
     }];

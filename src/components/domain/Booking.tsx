@@ -9,6 +9,7 @@ import { buildTimeline } from "../../lib/timeline";
 import { Button, ButtonLink } from "../ui/Button";
 import { Avatar, StatusBadge } from "../ui/Display";
 import { useConfirm, useToast } from "../ui/Overlay";
+import { NoteModal } from "./NoteModal";
 
 export type BookingRole = "citizen" | "provider";
 
@@ -45,17 +46,22 @@ export const BOOKING_ACTIONS: Record<BookingAction, ActionDef> = {
     label: "Cancel request", done: "Request cancelled", variant: "danger-outline",
     confirm: { title: "Cancel this request?", message: "The provider will be told you no longer need this service.", confirmLabel: "Cancel request", tone: "danger" },
   },
+  PROVIDER_CANCEL: { label: "Cancel job", done: "Job cancelled", variant: "danger-outline" },
 };
+
+/** The backend demands a reason (5-300 chars) for PROVIDER_CANCEL and for CANCEL once the booking is past PENDING. */
+export const needsReason = (booking: Pick<Booking, "status">, action: BookingAction) =>
+  action === "PROVIDER_CANCEL" || (action === "CANCEL" && booking.status !== "PENDING");
 
 export function availableActions(booking: Pick<Booking, "status">, role: BookingRole): BookingAction[] {
   if (role === "citizen") {
-    if (booking.status === "PENDING") return ["CANCEL"];
+    if (booking.status === "PENDING" || booking.status === "ACCEPTED") return ["CANCEL"];
     if (booking.status === "AWAITING_CONFIRMATION") return ["CONFIRM_COMPLETION"];
     return [];
   }
   if (booking.status === "PENDING") return ["ACCEPT", "REJECT"];
-  if (booking.status === "ACCEPTED") return ["START_WORK", "MARK_COMPLETED"];
-  if (booking.status === "IN_PROGRESS") return ["MARK_COMPLETED"];
+  if (booking.status === "ACCEPTED") return ["START_WORK", "MARK_COMPLETED", "PROVIDER_CANCEL"];
+  if (booking.status === "IN_PROGRESS") return ["MARK_COMPLETED", "PROVIDER_CANCEL"];
   return [];
 }
 
@@ -66,21 +72,34 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
   const confirm = useConfirm();
   const toast = useToast();
   const [busy, setBusy] = useState<BookingAction | null>(null);
+  const [asking, setAsking] = useState<BookingAction | null>(null);
   const actions = availableActions(booking, role);
 
-  const run = async (action: BookingAction) => {
-    const def = BOOKING_ACTIONS[action];
-    if (def.confirm && !(await confirm(def.confirm))) return;
+  const send = async (action: BookingAction, reason?: string) => {
     setBusy(action);
     try {
-      await api.bookingAction(booking.booking_id, action);
-      toast.success(def.done);
+      await api.bookingAction(booking.booking_id, action, reason);
+      toast.success(BOOKING_ACTIONS[action].done);
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "That didn't work. Try again.");
     } finally {
       setBusy(null);
       await onChanged();
     }
+  };
+
+  const run = async (action: BookingAction) => {
+    if (needsReason(booking, action)) { setAsking(action); return; }
+    const def = BOOKING_ACTIONS[action];
+    if (def.confirm && !(await confirm(def.confirm))) return;
+    await send(action);
+  };
+
+  const submitReason = async (note: string) => {
+    if (note.length < 5 || note.length > 300) throw new Error("Give a reason of 5 to 300 characters");
+    const action = asking!;
+    setAsking(null);
+    await send(action, note);
   };
 
   if (!actions.length) return null;
@@ -92,6 +111,10 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
           {BOOKING_ACTIONS[action].label}
         </Button>
       ))}
+      <NoteModal open={asking !== null} tone="danger" title={asking === "PROVIDER_CANCEL" ? "Cancel this job?" : "Cancel this booking?"}
+        intro={<p className="muted small">{asking === "PROVIDER_CANCEL" ? "The customer will see your reason." : "The provider will see your reason."}</p>}
+        label="Reason (at least 5 characters)" confirmLabel={asking === "PROVIDER_CANCEL" ? "Cancel job" : "Cancel booking"}
+        onClose={() => setAsking(null)} onSubmit={submitReason} />
     </>
   );
 }

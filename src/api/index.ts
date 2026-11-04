@@ -54,10 +54,10 @@ export const api = {
   bookings: (role: "citizen" | "provider") =>
     get<{ bookings: Booking[] }>("/bookings", { query: { role } }).then((r) => r.bookings),
   booking: (id: string) => get<{ booking: Booking }>(`/bookings/${id}`).then((r) => r.booking),
-  createBooking: (body: { service_id: string; booking_date: string; message: string }) =>
+  createBooking: (body: { service_id: string; booking_date: string; message: string; quartier: string; address_details: string }) =>
     post<{ booking: Booking }>("/bookings", body).then((r) => r.booking),
-  bookingAction: (id: string, action: BookingAction) =>
-    put<{ status: Booking["status"] }>(`/bookings/${id}`, { action }),
+  bookingAction: (id: string, action: BookingAction, reason?: string) =>
+    put<{ status: Booking["status"] }>(`/bookings/${id}`, { action, reason }),
 
   // --- reviews / reports ---
   myReviews: () => get<{ reviews: Review[] }>("/reviews/mine").then((r) => r.reviews),

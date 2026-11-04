@@ -1,11 +1,12 @@
 import { Link, useParams } from "react-router-dom";
-import { Calendar, CalendarX2, Flag, MapPin, MessageSquareText, Tag } from "lucide-react";
+import { Calendar, CalendarX2, Flag, MapPin, MessageSquareText, MessageCircle, Phone, Tag } from "lucide-react";
 import { api, ApiError } from "../../api";
 import { BookingActionButtons, BookingTimeline, useBookingRole } from "../../components/domain/Booking";
 import { BackLink } from "../../components/domain/Provider";
 import { ButtonLink } from "../../components/ui/Button";
 import { Avatar, CardSkeleton, EmptyState, ErrorState, StatusBadge } from "../../components/ui/Display";
 import { formatBookingDate, formatDateTime } from "../../lib/format";
+import { formatCmPhone, telUrl, whatsappUrl } from "../../lib/phone";
 import { BOOKING_STATUS } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 import type { Booking } from "../../api";
@@ -82,6 +83,26 @@ function Detail({ booking, reload }: { booking: Booking; reload: () => Promise<v
               </div>
             </div>
           </section>
+          {booking.counterparty_phone && (
+            <section className="card card-pad stack-sm" aria-label="Contact">
+              <h3 style={{ fontSize: "1rem" }}>Contact {role === "citizen" ? "the provider" : "the customer"}</h3>
+              <p style={{ fontWeight: 600 }}>{formatCmPhone(booking.counterparty_phone)}</p>
+              <div className="row">
+                <a className="btn btn-primary" href={telUrl(booking.counterparty_phone)}><Phone size={16} aria-hidden="true" />Call</a>
+                <a className="btn btn-secondary" target="_blank" rel="noopener noreferrer"
+                  href={whatsappUrl(booking.counterparty_phone, `Hello, about ServaLink booking ${booking.reference}`)}>
+                  <MessageCircle size={16} aria-hidden="true" />WhatsApp
+                </a>
+              </div>
+            </section>
+          )}
+          {booking.address_details && (
+            <section className="card card-pad stack-sm" aria-label="Address">
+              <h3 style={{ fontSize: "1rem" }}>{role === "provider" ? "Where to go" : "Your address"}</h3>
+              {booking.quartier && <p style={{ fontWeight: 600 }}>{booking.quartier}</p>}
+              <p style={{ whiteSpace: "pre-line" }}>{booking.address_details}</p>
+            </section>
+          )}
           <section className="card card-pad stack-sm" aria-label="Message">
             <h3 style={{ fontSize: "1rem" }}>Message</h3>
             <p style={{ whiteSpace: "pre-line" }} className={booking.message ? "" : "muted"}>{booking.message || "No message was added."}</p>

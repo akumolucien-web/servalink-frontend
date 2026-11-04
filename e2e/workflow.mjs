@@ -47,7 +47,8 @@ async function register(page, { name, email, city, phone }, { forceOnboarding = 
   await page.getByLabel("Full name").fill(name);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Phone number").fill(phone);
-  await page.getByLabel("Town / city").fill(city);
+  await page.getByLabel("Region").selectOption("SW"); // Buea is in the South-West
+  await page.getByLabel("Town / city").selectOption(city);
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByLabel("Confirm password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -104,7 +105,11 @@ async function main() {
       await register(marie.page, { name: "Marie Kamga", email: "marie@x.test", city: "Buea", phone: "+237 650 111 222" }, { forceOnboarding: true });
       await marie.page.waitForURL(/\/app\/onboarding/);
       await marie.page.getByLabel("Full name").fill("Marie Kamga");
-      await marie.page.getByLabel("Town / city").fill("Buea");
+      await marie.page.getByLabel("Region").selectOption("SW");
+      await marie.page.getByLabel("Town / city").selectOption("Buea");
+      await marie.page.getByLabel("Quartier", { exact: true }).selectOption("Molyko");
+      await marie.page.getByLabel("Phone number").fill("+237 650 111 222");
+      await marie.page.getByLabel(/I agree to the/).check();
       await marie.page.getByRole("button", { name: "Save and continue" }).click();
       await marie.page.waitForURL(/\/app$/);
       await marie.page.getByRole("heading", { name: /Marie!/ }).waitFor();
@@ -268,6 +273,10 @@ async function main() {
       await page.getByText("Choose a date and time").waitFor(); // inline validation
       await page.getByLabel("Date and time").fill(futureDate(3));
       await page.getByLabel("Describe the job").fill("Kitchen pipe under the sink is leaking.");
+      await page.getByRole("button", { name: "Send booking request" }).click();
+      await page.getByText("Select or type your quartier").waitFor(); // quartier + address are required
+      await page.getByLabel("Quartier", { exact: true }).selectOption("Molyko");
+      await page.getByLabel("Address and landmark").fill("Behind Total Molyko, blue gate, 2nd floor");
       await shot(page, "w-06-booking-form");
       await page.getByRole("button", { name: "Send booking request" }).click();
       await toast(page, "Booking request sent");

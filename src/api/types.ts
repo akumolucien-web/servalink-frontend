@@ -8,7 +8,7 @@ export type ProviderStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED" |
 export type ReportStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED";
 export type CategoryRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type BookingAction =
-  | "ACCEPT" | "REJECT" | "START_WORK" | "MARK_COMPLETED" | "CONFIRM_COMPLETION" | "CANCEL";
+  | "ACCEPT" | "REJECT" | "START_WORK" | "MARK_COMPLETED" | "CONFIRM_COMPLETION" | "CANCEL" | "PROVIDER_CANCEL";
 
 export interface Category {
   category_id: string;
@@ -103,6 +103,12 @@ export interface Booking {
   provider_name: string;
   reviewed: boolean;
   report_id?: string;
+  quartier?: string;
+  address_details?: string;
+  /** E.164; the backend only sends it once the booking is ACCEPTED or later. */
+  counterparty_phone?: string | null;
+  cancel_reason?: string;
+  cancelled_by?: "CITIZEN" | "PROVIDER";
 }
 
 export interface Review {
