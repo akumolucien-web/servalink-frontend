@@ -1,5 +1,5 @@
 import { getLang, translate, type Key, type Lang } from "../i18n/core";
-import type { BookingStatus, ProviderStatus, Rating, ReportStatus, CategoryRequestStatus } from "../api/types";
+import type { BookingStatus, ProviderStatus, Rating, ReportStatus, CategoryRequestStatus, VouchStatus } from "../api/types";
 
 export type Tone = "amber" | "teal" | "blue" | "purple" | "green" | "red" | "slate";
 
@@ -32,6 +32,13 @@ export const REQUEST_STATUS: Record<CategoryRequestStatus, { label: Key; tone: T
   PENDING: { label: "status.request.PENDING", tone: "amber" },
   APPROVED: { label: "status.request.APPROVED", tone: "green" },
   REJECTED: { label: "status.request.REJECTED", tone: "red" },
+};
+
+export const VOUCH_STATUS: Record<VouchStatus, { label: Key; tone: Tone }> = {
+  PENDING: { label: "status.vouch.PENDING", tone: "amber" },
+  CONFIRMED: { label: "status.vouch.CONFIRMED", tone: "green" },
+  DENIED: { label: "status.vouch.DENIED", tone: "red" },
+  EXPIRED: { label: "status.vouch.EXPIRED", tone: "slate" },
 };
 
 const UNKNOWN_STATUS: { label: Key; tone: Tone } = { label: "common.unknown", tone: "slate" };

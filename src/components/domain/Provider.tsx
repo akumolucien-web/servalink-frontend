@@ -1,11 +1,14 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BadgeCheck, ImagePlus, MapPin, X } from "lucide-react";
-import { validateImage, type ProviderCard as ProviderCardData, type Review, type Service } from "../../api";
+import { validateImage, type ProviderCard as ProviderCardData, type ProviderVouch, type Review, type Service } from "../../api";
 import { useT } from "../../i18n/I18nProvider";
 import { formatDate, formatFcfa } from "../../lib/format";
+import { formatJobMonth } from "../../lib/vouch";
 import { Button, ButtonLink } from "../ui/Button";
 import { Avatar, RatingChip } from "../ui/Display";
+
+export const vouchCountKey = (n: number) => (n === 1 ? "vouch.count.one" : "vouch.count.other") as "vouch.count.one";
 
 export function ProviderCard({ provider }: { provider: ProviderCardData }) {
   const t = useT();
@@ -20,6 +23,7 @@ export function ProviderCard({ provider }: { provider: ProviderCardData }) {
         <div className="row" style={{ gap: 10 }}>
           <RatingChip rating={provider.overall_rating} />
           {provider.review_count > 0 && <span className="muted small">{t(provider.review_count === 1 ? "common.reviews.one" : "common.reviews.other", { n: provider.review_count })}</span>}
+          {!!provider.vouch_count && <span className="muted small">{t(vouchCountKey(provider.vouch_count), { n: provider.vouch_count })}</span>}
           <span className="muted small row" style={{ gap: 4 }}><MapPin size={14} aria-hidden="true" />{provider.city}</span>
         </div>
         {provider.description && <p className="small" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{provider.description}</p>}
@@ -56,6 +60,24 @@ export function ReviewItem({ review }: { review: Review }) {
       </div>
       <p>{review.comment}</p>
       {review.photo_url && <a href={review.photo_url} target="_blank" rel="noreferrer"><img className="proof" src={review.photo_url} alt={t("common.reviewPhoto")} /></a>}
+    </article>
+  );
+}
+
+export function VouchItem({ vouch }: { vouch: ProviderVouch }) {
+  return (
+    <article className="review">
+      <div className="row-between">
+        <div className="row" style={{ gap: 10 }}>
+          <Avatar name={vouch.client_first_name} size={36} />
+          <div>
+            <div style={{ fontWeight: 600 }}>{vouch.client_first_name}</div>
+            <div className="muted xs">{formatJobMonth(vouch.job_month)}</div>
+          </div>
+        </div>
+        <RatingChip rating={vouch.rating} />
+      </div>
+      {vouch.comment && <p>{vouch.comment}</p>}
     </article>
   );
 }

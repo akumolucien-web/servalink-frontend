@@ -39,6 +39,7 @@ const FR: Record<string, string> = {
   "You can't vouch for yourself": "Vous ne pouvez pas vous recommander vous-même",
   "You already have 5 vouch requests waiting": "Vous avez déjà 5 demandes de recommandation en attente",
   "This client has already vouched 3 times this year": "Ce client a déjà recommandé 3 fois cette année",
+  "This vouch has already been processed": "Cette recommandation a déjà été traitée",
   "This vouch link is invalid or has expired": "Ce lien de recommandation n'est pas valide ou a expiré",
   // limits
   "Too many codes requested": "Trop de codes demandés. Réessayez plus tard.",

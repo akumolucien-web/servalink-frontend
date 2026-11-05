@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Images, MapPin, MessageSquareText, UserX, Wrench } from "lucide-react";
 import { api, ApiError } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
-import { ReviewItem, ServicePrice } from "../../components/domain/Provider";
+import { ReviewItem, ServicePrice, VouchItem, vouchCountKey } from "../../components/domain/Provider";
 import { ButtonLink } from "../../components/ui/Button";
 import { Avatar, Breadcrumbs, CardSkeleton, EmptyState, ErrorState, RatingChip, StatusBadge } from "../../components/ui/Display";
 import { Tabs } from "../../components/ui/Tabs";
@@ -117,6 +117,14 @@ export function ProviderProfilePage() {
                   </div>
                 )}
           </div>
+        )}
+
+        {!!p.vouches?.length && (
+          <section className="card card-pad stack-sm" aria-label={t(vouchCountKey(p.vouch_count ?? p.vouches.length), { n: p.vouch_count ?? p.vouches.length })}>
+            <h2 style={{ fontSize: "1.0625rem" }}>{t(vouchCountKey(p.vouch_count ?? p.vouches.length), { n: p.vouch_count ?? p.vouches.length })}</h2>
+            <p className="muted small">{t("vouch.profileText")}</p>
+            {p.vouches.map((vouch, i) => <VouchItem key={i} vouch={vouch} />)}
+          </section>
         )}
       </div>
     </>

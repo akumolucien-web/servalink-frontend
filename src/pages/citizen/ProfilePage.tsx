@@ -6,18 +6,20 @@ import { TermsCheckbox } from "../../components/domain/Legal";
 import { ImagePicker } from "../../components/domain/Provider";
 import { Button } from "../../components/ui/Button";
 import { Avatar, Banner, PageHeader } from "../../components/ui/Display";
-import { hasErrors, TextField, type Errors } from "../../components/ui/Field";
+import { hasErrors, SelectField, TextField, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
-import { useT } from "../../i18n/I18nProvider";
+import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDate } from "../../lib/format";
 import { citiesOf, fold } from "../../lib/locations";
 import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
+import { OPTIONS as LANGUAGES } from "../../layouts/LanguageSwitch";
 
 export function ProfilePage() {
   const { profile, saveProfile, session, hasProviderTools } = useAuth();
   const t = useT();
+  const { lang, setLang } = useLang();
   const toast = useToast();
-  const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", phone: "" });
+  const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", phone: "", notify_sms: true });
   const [agreed, setAgreed] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [ownPhoto, setOwnPhoto] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export function ProfilePage() {
     const region = profile.region ?? "";
     // Use the dataset spelling of the saved city so the select shows it.
     const city = citiesOf(region).find((c) => fold(c.name) === fold(profile.city))?.name ?? (region ? "" : profile.city);
-    setForm({ full_name: profile.full_name, region, city, quartier: profile.quartier ?? "", phone: profile.phone ?? "" });
+    setForm({ full_name: profile.full_name, region, city, quartier: profile.quartier ?? "", phone: profile.phone ?? "", notify_sms: profile.notify_sms !== false });
   }, [profile]);
   // GET /profile returns only the image key, so a photo URL is available just for approved providers.
   useEffect(() => {
@@ -52,7 +54,7 @@ export function ProfilePage() {
     try {
       const profile_image_key = photo ? await uploadImage(photo, "PROFILE_IMAGE") : undefined;
       await saveProfile({
-        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(),
+        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms,
         ...(needsTerms ? { accept_terms: true } : {}),
         ...(profile_image_key ? { profile_image_key } : {}),
       });
@@ -74,6 +76,13 @@ export function ProfilePage() {
             <TextField label={t("auth.phone")} type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <div className="form-grid"><LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} /></div>
+          <SelectField label={t("lang.label")} value={lang} onChange={(e) => setLang(e.target.value as typeof lang)}>
+            {LANGUAGES.map(({ code, name }) => <option key={code} value={code} lang={code}>{name}</option>)}
+          </SelectField>
+          <label className="check">
+            <input type="checkbox" checked={form.notify_sms} onChange={(e) => setForm({ ...form, notify_sms: e.target.checked })} />
+            <span>{t("prof.smsToggle")}</span>
+          </label>
           <TextField label={t("f.email")} value={session?.email ?? ""} disabled readOnly hint={t("prof.emailHint")} />
           <ImagePicker label={t("prof.photo")} file={photo} onChange={setPhoto}
             hint={profile?.profile_image_key ? t("prof.photoSaved") : t("image.hint")} />

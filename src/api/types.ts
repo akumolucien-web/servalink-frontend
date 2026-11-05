@@ -7,6 +7,7 @@ export type Rating = "BAD" | "GOOD" | "VERY_GOOD" | "EXCELLENT";
 export type ProviderStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED" | "BANNED";
 export type ReportStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED";
 export type CategoryRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type VouchStatus = "PENDING" | "CONFIRMED" | "DENIED" | "EXPIRED";
 export type BookingAction =
   | "ACCEPT" | "REJECT" | "START_WORK" | "MARK_COMPLETED" | "CONFIRM_COMPLETION" | "CANCEL" | "PROVIDER_CANCEL";
 
@@ -29,6 +30,7 @@ export interface Profile {
   phone: string;
   profile_image_key: string | null;
   language?: "fr" | "en";
+  notify_sms?: boolean;
   terms_accepted_at?: string;
   terms_version?: string;
   created_at?: string;
@@ -65,6 +67,7 @@ export interface ProviderCard {
   review_count: number;
   bad_review_count: number;
   overall_rating: Rating | null;
+  vouch_count?: number;
 }
 
 export interface Service {
@@ -87,7 +90,44 @@ export interface Service {
 
 export interface ProviderDetail extends ProviderCard {
   services: Service[];
+  vouches?: ProviderVouch[];
 }
+
+/** A confirmed client vouch shown on a public provider profile. */
+export interface ProviderVouch {
+  client_first_name: string;
+  rating: Rating;
+  comment?: string;
+  job_month: string;
+}
+
+/** The provider's own view of a vouch request. The backend never sends an id, token or code, so created_at is the list key. */
+export interface Vouch {
+  client_name: string;
+  client_phone: string;
+  job_summary: string;
+  job_month: string;
+  status: VouchStatus;
+  rating?: Rating | null;
+  comment?: string;
+  created_at: string;
+  expires_at: string;
+}
+
+/** What the client sees at /vouch/:token. */
+export interface PublicVouch {
+  provider_name: string;
+  service_title: string;
+  client_first_name: string;
+  job_summary: string;
+  job_month: string;
+  status: VouchStatus;
+}
+
+export type VouchActionBody =
+  | { action: "SEND_CODE" }
+  | { action: "CONFIRM"; code: string; rating: Rating; comment?: string }
+  | { action: "DENY"; code: string };
 
 export interface Booking {
   booking_id: string;

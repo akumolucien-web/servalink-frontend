@@ -1,6 +1,6 @@
 import { useLang, useT, type Lang } from "../i18n/I18nProvider";
 
-const OPTIONS: { code: Lang; label: string; name: string }[] = [
+export const OPTIONS: { code: Lang; label: string; name: string }[] = [
   { code: "fr", label: "FR", name: "Français" },
   { code: "en", label: "EN", name: "English" },
 ];

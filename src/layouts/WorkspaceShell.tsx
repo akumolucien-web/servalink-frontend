@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   BadgeCheck, Briefcase, CalendarCheck, ChevronDown, Flag, Images, Inbox, LayoutDashboard, LogOut, Menu,
-  MessageSquareText, Search, Tags, User, Users, Wrench,
+  MessageSquareText, Search, Tags, User, UserCheck, Users, Wrench,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { AttentionMenu } from "../components/domain/AttentionMenu";
@@ -29,6 +29,7 @@ const PROVIDER_NAV: NavItem[] = [
   { to: "/app/provider/bookings", label: "ws.bookingRequests", icon: icon(Inbox) },
   { to: "/app/provider/services", label: "ws.myServices", icon: icon(Wrench) },
   { to: "/app/provider/gallery", label: "ws.workGallery", icon: icon(Images) },
+  { to: "/app/provider/vouches", label: "ws.pastClients", icon: icon(UserCheck) },
   { to: "/app/provider/profile", label: "ws.providerProfile", icon: icon(BadgeCheck) },
 ];
 const ADMIN_NAV: NavItem[] = [

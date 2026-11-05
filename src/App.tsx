@@ -31,12 +31,14 @@ import { ProviderBookingsPage } from "./pages/provider/ProviderBookingsPage";
 import { ProviderDashboardPage } from "./pages/provider/ProviderDashboardPage";
 import { ProviderGalleryPage } from "./pages/provider/ProviderGalleryPage";
 import { ProviderServicesPage } from "./pages/provider/ProviderServicesPage";
+import { ProviderVouchesPage } from "./pages/provider/ProviderVouchesPage";
 import { BecomeProviderInfoPage } from "./pages/public/BecomeProviderInfoPage";
 import { HomePage } from "./pages/public/HomePage";
 import { ProviderProfilePage } from "./pages/public/ProviderProfilePage";
 import { PrivacyPage } from "./pages/public/PrivacyPage";
 import { SearchPage } from "./pages/public/SearchPage";
 import { TermsPage } from "./pages/public/TermsPage";
+import { VouchPage } from "./pages/public/VouchPage";
 
 /** Scroll to top on navigation, or to the #anchor (How it works / About). */
 function ScrollManager() {
@@ -63,6 +65,7 @@ export default function App() {
           <Route path="/become-provider" element={<BecomeProviderInfoPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/vouch/:token" element={<VouchPage />} />
         </Route>
 
         <Route element={<AdaptiveShell />}>
@@ -100,6 +103,7 @@ export default function App() {
                 <Route path="/app/provider/bookings" element={<ProviderBookingsPage />} />
                 <Route path="/app/provider/services" element={<ProviderServicesPage />} />
                 <Route path="/app/provider/gallery" element={<ProviderGalleryPage />} />
+                <Route path="/app/provider/vouches" element={<ProviderVouchesPage />} />
                 <Route path="/app/provider/profile" element={<OwnProviderProfilePage />} />
               </Route>
             </Route>
