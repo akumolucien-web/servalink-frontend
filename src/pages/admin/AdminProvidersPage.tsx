@@ -71,7 +71,7 @@ export function AdminProvidersPage() {
                           <td>{p.service_category}<br /><span className="muted xs">{p.service_title}</span></td>
                           <td>{p.city}</td><td className="nowrap">{formatDateTime(p.created_at)}</td>
                           <td><StatusBadge label={t(statusOf(PROVIDER_STATUS, p.status).label)} tone={statusOf(PROVIDER_STATUS, p.status).tone} /></td>
-                          <td><Button size="sm" variant="secondary" onClick={() => setDetail(p)}>{t(DECISIONS[p.status].length ? "ad.review" : "ap.details")}</Button></td>
+                          <td><Button size="sm" variant="secondary" onClick={() => setDetail(p)}>{t((DECISIONS[p.status] ?? []).length ? "ad.review" : "ap.details")}</Button></td>
                         </tr>
                       ))}
                     </tbody>
@@ -81,7 +81,7 @@ export function AdminProvidersPage() {
       </div>
 
       <Modal wide open={!!detail} title={detail ? t("ap.applicationOf", { name: detail.name }) : ""} onClose={() => { setDetail(null); leaveRoute(); }}
-        footer={detail && DECISIONS[detail.status].map((def) => (
+        footer={detail && (DECISIONS[detail.status] ?? []).map((def) => (
           <Button key={def.status} variant={def.variant} onClick={() => { setDecision({ provider: detail, def }); setDetail(null); }}>{t(def.label)}</Button>
         ))}>
         {detail && (
