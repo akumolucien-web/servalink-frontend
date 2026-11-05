@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const pending = takePendingProfile(current.phone);
         if (pending) {
           try {
-            finalProfile = await api.saveProfile(withLang({ full_name: pending.full_name, region: pending.region, city: pending.city, phone: pending.phone, accept_terms: true })); // consent line shown under "Create Account"
+            finalProfile = await api.saveProfile(withLang({ full_name: pending.full_name, region: pending.region, city: pending.city, accept_terms: true })); // consent line shown under "Create Account"
           } catch { finalProfile = null; }
         }
       }

@@ -29,7 +29,7 @@ export const api = {
     try { return await get<Profile>("/profile"); }
     catch (error) { if (error instanceof ApiError && error.status === 404) return null; throw error; }
   },
-  saveProfile: (body: { full_name: string; region: string; city: string; quartier?: string; phone: string; profile_image_key?: string | null; accept_terms?: boolean; language?: "fr" | "en"; notify_sms?: boolean }) =>
+  saveProfile: (body: { full_name: string; region: string; city: string; quartier?: string; profile_image_key?: string | null; accept_terms?: boolean; language?: "fr" | "en"; notify_sms?: boolean }) =>
     put<{ profile: Profile }>("/profile", body).then((r) => r.profile),
 
   // --- provider (own) ---

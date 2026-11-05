@@ -108,7 +108,6 @@ async function main() {
       await marie.page.getByLabel("Region").selectOption("SW");
       await marie.page.getByLabel("Town / city").selectOption("Buea");
       await marie.page.getByLabel("Quartier", { exact: true }).selectOption("Molyko");
-      await marie.page.getByLabel("Phone number").fill("+237 650 111 222");
       await marie.page.getByLabel(/I agree to the/).check();
       await marie.page.getByRole("button", { name: "Save and continue" }).click();
       await marie.page.waitForURL(/\/app$/);

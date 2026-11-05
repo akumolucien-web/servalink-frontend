@@ -636,6 +636,7 @@ export const fr: Record<keyof typeof en, string> = {
   "prof.title": "Mon profil",
   "prof.sub": "Vos informations sont partagées avec les prestataires lorsque vous les réservez.",
   "prof.aria": "Profil",
+  "prof.phoneHint": "Votre numéro de connexion, confirmé par SMS.",
   "prof.emailHint": "Votre e-mail est facultatif et ne peut pas être modifié ici.",
   "prof.photo": "Photo de profil",
   "prof.photoSaved": "Une photo est enregistrée. Choisissez-en une nouvelle pour la remplacer.",

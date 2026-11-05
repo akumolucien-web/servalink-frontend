@@ -638,6 +638,7 @@ export const en = {
   "prof.title": "My profile",
   "prof.sub": "Your details are shared with providers when you book them.",
   "prof.aria": "Profile",
+  "prof.phoneHint": "Your sign-in number, confirmed by SMS.",
   "prof.emailHint": "Your email is optional and can't be changed here.",
   "prof.photo": "Profile photo",
   "prof.photoSaved": "A photo is saved. Choose a new one to replace it.",

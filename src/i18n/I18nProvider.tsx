@@ -23,7 +23,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (current && current.region && current.language !== next) {
       try {
         await saveProfile({
-          full_name: current.full_name, region: current.region, city: current.city, phone: current.phone,
+          full_name: current.full_name, region: current.region, city: current.city,
           quartier: current.quartier ?? "", language: next,
         });
       } catch {

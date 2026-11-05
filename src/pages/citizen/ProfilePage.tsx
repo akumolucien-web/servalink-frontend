@@ -12,7 +12,7 @@ import { translate } from "../../i18n/core";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDate } from "../../lib/format";
 import { citiesOf, fold } from "../../lib/locations";
-import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
+import { formatCmPhone } from "../../lib/phone";
 import { OPTIONS as LANGUAGES } from "../../layouts/LanguageSwitch";
 
 export function ProfilePage() {
@@ -20,7 +20,7 @@ export function ProfilePage() {
   const t = useT();
   const { lang, setLang } = useLang();
   const toast = useToast();
-  const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", phone: "", notify_sms: true });
+  const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", notify_sms: true });
   const [agreed, setAgreed] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [ownPhoto, setOwnPhoto] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export function ProfilePage() {
     const region = profile.region ?? "";
     // Use the dataset spelling of the saved city so the select shows it.
     const city = citiesOf(region).find((c) => fold(c.name) === fold(profile.city))?.name ?? (region ? "" : profile.city);
-    setForm({ full_name: profile.full_name, region, city, quartier: profile.quartier ?? "", phone: profile.phone ?? "", notify_sms: profile.notify_sms !== false });
+    setForm({ full_name: profile.full_name, region, city, quartier: profile.quartier ?? "", notify_sms: profile.notify_sms !== false });
   }, [profile]);
   // GET /profile returns only the image key, so a photo URL is available just for approved providers.
   useEffect(() => {
@@ -50,7 +50,6 @@ export function ProfilePage() {
     if (!form.full_name.trim()) next.full_name = t("auth.nameRequired");
     if (!form.region) next.region = t("auth.regionRequired");
     if (form.region && !form.city) next.city = t("auth.cityRequired");
-    if (!normalizeCmPhone(form.phone)) next.phone = t("auth.phoneInvalid");
     if (needsTerms && !agreed) next.terms = t("onboarding.termsRequired");
     setErrors(next);
     if (hasErrors(next)) return;
@@ -58,7 +57,7 @@ export function ProfilePage() {
     try {
       const profile_image_key = photo ? await uploadImage(photo, "PROFILE_IMAGE") : undefined;
       await saveProfile({
-        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms,
+        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), notify_sms: form.notify_sms,
         // Only fill a missing language; never let this device's choice silently overwrite the account's.
         ...(profile?.language ? {} : { language: lang }),
         ...(needsTerms ? { accept_terms: true } : {}),
@@ -79,7 +78,7 @@ export function ProfilePage() {
           {errors.form && <Banner tone="danger">{errors.form}</Banner>}
           <div className="form-grid">
             <TextField className="span-2" label={t("auth.fullName")} autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
-            <TextField label={t("auth.phone")} type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <TextField label={t("auth.phone")} value={formatCmPhone(session?.phone ?? "")} disabled readOnly hint={t("prof.phoneHint")} />
           </div>
           <div className="form-grid"><LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} /></div>
           <SelectField label={t("lang.label")} value={lang} onChange={async (e) => { const next = e.target.value as typeof lang; if (!(await setLang(next))) toast.error(translate(next, "prof.failed")); }}>
