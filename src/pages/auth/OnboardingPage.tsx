@@ -10,6 +10,7 @@ import { Banner } from "../../components/ui/Display";
 import { hasErrors, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
 import { FullPageLoading } from "../../auth/guards";
+import { useT } from "../../i18n/I18nProvider";
 import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
 import { safeNext } from "../../lib/redirect";
 
@@ -18,6 +19,7 @@ export function OnboardingPage() {
   const { profile, accountLoading, saveProfile, isAdmin, session } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+  const t = useT();
   const [params] = useSearchParams();
   const destination = safeNext(params.get("next"), "/app");
   const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", phone: "" });
@@ -32,11 +34,11 @@ export function OnboardingPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
-    if (!form.full_name.trim()) next.full_name = "Enter your full name";
-    if (!form.region) next.region = "Select your region";
-    if (form.region && !form.city) next.city = "Select your town or city";
-    if (!normalizeCmPhone(form.phone)) next.phone = "Enter a Cameroon number, e.g. 6 77 12 34 56";
-    if (!agreed) next.terms = "You must accept the Terms and Privacy notice to continue";
+    if (!form.full_name.trim()) next.full_name = t("auth.nameRequired");
+    if (!form.region) next.region = t("auth.regionRequired");
+    if (form.region && !form.city) next.city = t("auth.cityRequired");
+    if (!normalizeCmPhone(form.phone)) next.phone = t("auth.phoneInvalid");
+    if (!agreed) next.terms = t("onboarding.termsRequired");
     setErrors(next);
     if (hasErrors(next)) return;
     setBusy(true);
@@ -45,25 +47,25 @@ export function OnboardingPage() {
         full_name: form.full_name.trim(), region: form.region, city: form.city, phone: form.phone.trim(),
         ...(form.quartier.trim() ? { quartier: form.quartier.trim() } : {}), accept_terms: true,
       });
-      toast.success("Profile saved");
+      toast.success(t("onboarding.saved"));
       navigate(destination, { replace: true });
     } catch (error) {
-      setErrors({ form: error instanceof Error ? error.message : "We couldn't save your profile." });
+      setErrors({ form: error instanceof Error ? error.message : t("onboarding.failed") });
       setBusy(false);
     }
   };
 
   return (
     <section aria-labelledby="onboarding-title">
-      <h1 id="onboarding-title" className="auth-title">Finish setting up your profile</h1>
-      <p className="auth-sub">Signed in as {session?.email || formatCmPhone(session?.phone ?? "")}. Tell us where you're based so providers know who they're helping.</p>
+      <h1 id="onboarding-title" className="auth-title">{t("onboarding.title")}</h1>
+      <p className="auth-sub">{t("onboarding.sub", { who: session?.email || formatCmPhone(session?.phone ?? "") })}</p>
       <form className="auth-form" onSubmit={submit} noValidate>
         {errors.form && <Banner tone="danger">{errors.form}</Banner>}
-        <AuthInput label="Full name" icon={<User size={19} />} autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+        <AuthInput label={t("auth.fullName")} icon={<User size={19} />} autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
         <LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} />
-        <AuthInput label="Phone number" placeholder="Phone (e.g. 6 77 12 34 56)" icon={<Phone size={19} />} type="tel" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <AuthInput label={t("auth.phone")} placeholder={t("auth.phonePlaceholder")} icon={<Phone size={19} />} type="tel" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         <TermsCheckbox checked={agreed} error={errors.terms} onChange={setAgreed} />
-        <Button type="submit" size="lg" block loading={busy} className="auth-submit">Save and continue {!busy && <ArrowRight size={19} aria-hidden="true" />}</Button>
+        <Button type="submit" size="lg" block loading={busy} className="auth-submit">{t("onboarding.save")} {!busy && <ArrowRight size={19} aria-hidden="true" />}</Button>
       </form>
     </section>
   );

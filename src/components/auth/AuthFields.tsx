@@ -1,5 +1,6 @@
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
+import { useT } from "../../i18n/I18nProvider";
 
 interface AuthInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "children"> {
   /** Accessible name. Shown as the placeholder too, as in the design, but always a real <label> for screen readers. */
@@ -31,11 +32,12 @@ export function AuthInput({ label, icon, error, hint, right, placeholder, classN
 
 export function AuthPasswordInput({ label, icon, ...rest }: Omit<AuthInputProps, "type" | "right" | "icon"> & { icon?: ReactNode }) {
   const [visible, setVisible] = useState(false);
+  const t = useT();
   return (
     <AuthInput label={label} icon={icon ?? <Lock size={19} />} type={visible ? "text" : "password"} {...rest}
       right={
         <button type="button" className="afield-toggle" onClick={() => setVisible((v) => !v)}
-          aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible}>
+          aria-label={visible ? t("common.hidePassword") : t("common.showPassword")} aria-pressed={visible}>
           {visible ? <EyeOff size={19} /> : <Eye size={19} />}
         </button>
       } />

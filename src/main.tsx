@@ -11,14 +11,17 @@ import "./styles/auth.css";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import { OverlayProvider } from "./components/ui/Overlay";
+import { I18nProvider } from "./i18n/I18nProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <OverlayProvider>
-          <App />
-        </OverlayProvider>
+        <I18nProvider>
+          <OverlayProvider>
+            <App />
+          </OverlayProvider>
+        </I18nProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

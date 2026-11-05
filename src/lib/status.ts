@@ -1,3 +1,4 @@
+import { getLang, type Lang } from "../i18n/core";
 import type { BookingStatus, ProviderStatus, Rating, ReportStatus, CategoryRequestStatus } from "../api/types";
 
 export type Tone = "amber" | "teal" | "blue" | "purple" | "green" | "red" | "slate";
@@ -37,6 +38,9 @@ export const REQUEST_STATUS: Record<CategoryRequestStatus, { label: string; tone
 export const RATING_LABEL: Record<Rating, string> = {
   BAD: "Bad", GOOD: "Good", VERY_GOOD: "V.Good", EXCELLENT: "Excellent",
 };
+const RATING_LABEL_FR: Record<Rating, string> = { BAD: "Mauvais", GOOD: "Bien", VERY_GOOD: "Très bien", EXCELLENT: "Excellent" };
+/** Rating word in the given language (default: the active one). */
+export const ratingLabel = (rating: Rating, lang: Lang = getLang()) => (lang === "fr" ? RATING_LABEL_FR : RATING_LABEL)[rating];
 export const RATING_ORDER: Rating[] = ["BAD", "GOOD", "VERY_GOOD", "EXCELLENT"];
 export const ratingRank = (rating: Rating | null | undefined) => (rating ? RATING_ORDER.indexOf(rating) + 1 : 0);
 

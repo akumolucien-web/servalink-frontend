@@ -26,6 +26,7 @@ export interface Profile {
   quartier?: string;
   phone: string;
   profile_image_key: string | null;
+  language?: "fr" | "en";
   terms_accepted_at?: string;
   terms_version?: string;
   created_at?: string;

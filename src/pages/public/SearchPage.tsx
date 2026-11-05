@@ -7,7 +7,7 @@ import { Button, ButtonLink } from "../../components/ui/Button";
 import { CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { LocationPicker } from "../../components/domain/LocationPicker";
 import { SelectField } from "../../components/ui/Field";
-import { plural } from "../../lib/format";
+import { useT } from "../../i18n/I18nProvider";
 import { regionOfCity } from "../../lib/locations";
 import { ratingRank } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
@@ -16,6 +16,7 @@ type Sort = "rating" | "reviews" | "name";
 
 export function SearchPage() {
   const [params, setParams] = useSearchParams();
+  const t = useT();
   const category = params.get("category") ?? "";
   const city = params.get("city") ?? "";
   const [sort, setSort] = useState<Sort>("rating");
@@ -46,40 +47,40 @@ export function SearchPage() {
     setParams(next);
   };
 
-  const title = category && city ? `${category} services in ${city}` : category ? `${category} services` : city ? `Services in ${city}` : "Find a service";
+  const title = category && city ? t("search.titleBoth", { category, city }) : category ? t("search.titleCategory", { category }) : city ? t("search.titleCity", { city }) : t("nav.findService");
   return (
     <>
       <PageHeader title={title}
-        subtitle={results.data ? `${plural(results.data.length, "provider")} found` : "Search approved providers by category and town."} />
-      <form className="card filter-bar" onSubmit={submit} aria-label="Search filters">
-        <SelectField label="Service category" value={draftCategory} onChange={(e) => setDraftCategory(e.target.value)}>
-          <option value="">All categories</option>
+        subtitle={results.data ? t(results.data.length === 1 ? "search.found.one" : "search.found.other", { n: results.data.length }) : t("search.subtitle")} />
+      <form className="card filter-bar" onSubmit={submit} aria-label={t("search.filters")}>
+        <SelectField label={t("home.category")} value={draftCategory} onChange={(e) => setDraftCategory(e.target.value)}>
+          <option value="">{t("search.allCategories")}</option>
           {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
         </SelectField>
         <LocationPicker level="city" value={draftLoc} onChange={setDraftLoc} />
-        <div style={{ alignSelf: "end" }}><Button type="submit" icon={<Search size={16} />} block>Search</Button></div>
+        <div style={{ alignSelf: "end" }}><Button type="submit" icon={<Search size={16} />} block>{t("search.button")}</Button></div>
       </form>
 
       <div className="results-head">
-        <span className="muted small" aria-live="polite">{results.loading ? "Searching…" : ""}</span>
+        <span className="muted small" aria-live="polite">{results.loading ? t("search.searching") : ""}</span>
         <div style={{ width: 220 }}>
-          <SelectField label="Sort by" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-            <option value="rating">Rating</option>
-            <option value="reviews">Most reviews</option>
-            <option value="name">Name (A to Z)</option>
+          <SelectField label={t("search.sortBy")} value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+            <option value="rating">{t("search.sortRating")}</option>
+            <option value="reviews">{t("search.sortReviews")}</option>
+            <option value="name">{t("search.sortName")}</option>
           </SelectField>
         </div>
       </div>
 
       {results.loading && !results.data ? <CardSkeleton rows={3} />
-        : results.error ? <ErrorState error={results.error} onRetry={results.reload} title="We couldn't load providers" />
+        : results.error ? <ErrorState error={results.error} onRetry={results.reload} title={t("search.error")} />
           : sorted.length === 0 ? (
             <div className="card">
-              <EmptyState icon={<SearchX size={24} />} title="No providers found"
-                action={(category || city) ? <ButtonLink to="/search" variant="secondary">Clear filters</ButtonLink> : undefined}>
+              <EmptyState icon={<SearchX size={24} />} title={t("search.emptyTitle")}
+                action={(category || city) ? <ButtonLink to="/search" variant="secondary">{t("search.clear")}</ButtonLink> : undefined}>
                 {category || city
-                  ? "Try another town or category. New providers join as they're approved."
-                  : "No approved providers are listed yet. Check back soon."}
+                  ? t("search.emptyFiltered")
+                  : t("search.emptyAll")}
               </EmptyState>
             </div>
           ) : (
@@ -87,7 +88,7 @@ export function SearchPage() {
           )}
 
       <p className="muted small" style={{ marginTop: 28 }}>
-        Offer a service in your town? <Link to="/become-provider">Become a provider</Link>
+        {t("search.offer")} <Link to="/become-provider">{t("search.becomeProvider")}</Link>
       </p>
     </>
   );

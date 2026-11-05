@@ -3,17 +3,19 @@ import { AlertTriangle, CheckCircle2, Info, TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Rating } from "../../api/types";
 import { initials } from "../../lib/format";
-import { RATING_LABEL, type Tone } from "../../lib/status";
+import { useT } from "../../i18n/I18nProvider";
+import { ratingLabel, type Tone } from "../../lib/status";
 import { Button } from "./Button";
 
 export function StatusBadge({ label, tone, dot = true }: { label: string; tone: Tone; dot?: boolean }) {
   return <span className={`badge tone-${tone}`}>{dot && <span className="dot" aria-hidden="true" />}{label}</span>;
 }
 
-/** Rating as a label chip. ServaLink uses labels (Bad / Good / V.Good / Excellent), never stars or numbers. */
+/** Rating as a word (Bad / Good / V.Good / Excellent; Mauvais / Bien / Très bien / Excellent), never stars or numbers. */
 export function RatingChip({ rating }: { rating: Rating | null | undefined }) {
-  if (!rating) return <span className="rating rating-none">No reviews yet</span>;
-  return <span className={`rating rating-${rating}`}>{RATING_LABEL[rating]}</span>;
+  const t = useT();
+  if (!rating) return <span className="rating rating-none">{t("common.noReviews")}</span>;
+  return <span className={`rating rating-${rating}`}>{ratingLabel(rating)}</span>;
 }
 
 export function Avatar({ name, src, size = 40 }: { name?: string; src?: string | null; size?: number }) {
@@ -30,8 +32,9 @@ export function Skeleton({ height = 16, width = "100%", radius }: { height?: num
 }
 
 export function CardSkeleton({ rows = 3 }: { rows?: number }) {
+  const t = useT();
   return (
-    <div className="stack" role="status" aria-label="Loading">
+    <div className="stack" role="status" aria-label={t("common.loading")}>
       {Array.from({ length: rows }, (_, i) => (
         <div className="card card-pad stack-sm" key={i}>
           <Skeleton height={18} width="40%" /><Skeleton height={14} width="75%" /><Skeleton height={14} width="55%" />
@@ -52,13 +55,14 @@ export function EmptyState({ icon, title, children, action }: { icon: ReactNode;
   );
 }
 
-export function ErrorState({ error, onRetry, title = "We couldn't load this" }: { error: Error; onRetry?: () => void; title?: string }) {
+export function ErrorState({ error, onRetry, title }: { error: Error; onRetry?: () => void; title?: string }) {
+  const t = useT();
   return (
     <div className="state error" role="alert">
       <div className="state-icon" aria-hidden="true"><AlertTriangle size={24} /></div>
-      <h3>{title}</h3>
+      <h3>{title ?? t("common.couldntLoad")}</h3>
       <p>{error.message}</p>
-      {onRetry && <Button variant="secondary" onClick={onRetry}>Try again</Button>}
+      {onRetry && <Button variant="secondary" onClick={onRetry}>{t("common.tryAgain")}</Button>}
     </div>
   );
 }

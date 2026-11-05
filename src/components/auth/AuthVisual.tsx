@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { MapPin, ShieldCheck, Users } from "lucide-react";
+import { useT, type Key } from "../../i18n/I18nProvider";
 
 import photo from "../../assets/auth-painter.webp";
 
@@ -28,13 +29,14 @@ export function panelPath(w: number, h: number): string {
   ].join(" ");
 }
 
-const FEATURES = [
-  { icon: Users, label: "Verified Providers" },
-  { icon: ShieldCheck, label: "Safe & Reliable" },
-  { icon: MapPin, label: "Local Services in Your City" },
+const FEATURES: { icon: typeof Users; label: Key }[] = [
+  { icon: Users, label: "visual.verified" },
+  { icon: ShieldCheck, label: "visual.safe" },
+  { icon: MapPin, label: "visual.local" },
 ];
 
 export function AuthVisual() {
+  const t = useT();
   const ref = useRef<HTMLElement>(null);
   const [path, setPath] = useState<string>();
   useLayoutEffect(() => {
@@ -48,17 +50,17 @@ export function AuthVisual() {
   }, []);
 
   return (
-    <aside ref={ref} className="auth-visual" aria-label="About ServaLink"
+    <aside ref={ref} className="auth-visual" aria-label={t("visual.about")}
       style={path ? { clipPath: `path('${path}')` } : undefined}>
       <div className="auth-visual-img" style={{ backgroundImage: `url(${photo})` }} aria-hidden="true" />
       <div className="auth-visual-shade" aria-hidden="true" />
       <div className="auth-visual-copy">
-        <p className="auth-visual-title">Trusted local professionals for a better home.</p>
-        <p className="auth-visual-text">From painting to plumbing, find skilled providers in your city.</p>
+        <p className="auth-visual-title">{t("visual.title")}</p>
+        <p className="auth-visual-text">{t("visual.text")}</p>
       </div>
       <ul className="auth-visual-features">
         {FEATURES.map(({ icon: Icon, label }) => (
-          <li key={label}><span className="dot"><Icon size={19} aria-hidden="true" /></span><span>{label}</span></li>
+          <li key={label}><span className="dot"><Icon size={19} aria-hidden="true" /></span><span>{t(label)}</span></li>
         ))}
       </ul>
     </aside>

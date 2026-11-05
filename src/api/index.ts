@@ -1,3 +1,5 @@
+import { translateApiMessage } from "../i18n/apiMessages";
+import { getLang } from "../i18n/core";
 import { ApiError, del, get, post, put } from "./client";
 import type {
   AdminProvider, Booking, BookingAction, Category, CategoryRequest, GalleryItem, Profile,
@@ -27,7 +29,7 @@ export const api = {
     try { return await get<Profile>("/profile"); }
     catch (error) { if (error instanceof ApiError && error.status === 404) return null; throw error; }
   },
-  saveProfile: (body: { full_name: string; region: string; city: string; quartier?: string; phone: string; profile_image_key?: string | null; accept_terms?: boolean }) =>
+  saveProfile: (body: { full_name: string; region: string; city: string; quartier?: string; phone: string; profile_image_key?: string | null; accept_terms?: boolean; language?: "fr" | "en" }) =>
     put<{ profile: Profile }>("/profile", body).then((r) => r.profile),
 
   // --- provider (own) ---
@@ -92,8 +94,8 @@ export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 export function validateImage(file: File): string | null {
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return "Use a JPEG, PNG or WEBP image.";
-  if (file.size > MAX_IMAGE_BYTES) return "The image must be 10 MB or smaller.";
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return translateApiMessage("Use a JPEG, PNG or WEBP image.", getLang());
+  if (file.size > MAX_IMAGE_BYTES) return translateApiMessage("The image must be 10 MB or smaller.", getLang());
   return null;
 }
 

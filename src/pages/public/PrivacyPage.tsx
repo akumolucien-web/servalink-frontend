@@ -1,16 +1,18 @@
 import { Bullets, LegalDoc } from "../../components/domain/Legal";
+import { useT } from "../../i18n/I18nProvider";
 
 export function PrivacyPage() {
+  const t = useT();
   return (
-    <LegalDoc title="Privacy notice" sections={[
-      ["Data we collect", <Bullets items={["Your name, phone number and e-mail address", "Your region, city and quartier", "Photos you upload (profile photo, work gallery, report evidence)", "Booking details (service, date, notes, status)", "Reports and reviews you submit"]} />],
-      ["Why we use it", <Bullets items={["to create and run your account", "to match customers with providers near them", "to manage bookings, reviews and reports", "to keep the platform safe and prevent abuse", "to contact you about your bookings and account"]} />],
-      ["Who sees what", <p>Providers and customers see each other's name and public profile. Your phone number and address are only shared with the other party after a booking is accepted. Administrators can see account and report data when needed to moderate the platform. We do not sell your data.</p>],
-      ["Storage and security", <p>Your data is stored on Amazon Web Services in the eu-north-1 region (Stockholm, Sweden). Data is encrypted in transit and access is restricted to what the service needs. No system is perfectly secure, so please choose a strong password.</p>],
-      ["How long we keep it", <p>We keep your data while your account is active. After you ask us to delete your account we remove or anonymise your personal data, except what we must keep to meet legal obligations or to resolve disputes.</p>],
-      ["Your rights", <><p>You can:</p><Bullets items={["access the personal data we hold about you", "correct it (most details can be edited in your profile)", "ask for your data to be deleted, by contacting us"]} /></>],
-      ["Applicable law", <p>We process personal data in line with Cameroon's personal-data protection and cybersecurity laws, as applicable. [The exact legal citation must be confirmed by the reviewing lawyer.]</p>],
-      ["Contact", <p>To exercise your rights or ask a question, use the contact details published on ServaLink (the official contact e-mail will be confirmed before public launch).</p>],
+    <LegalDoc title={t("legal.privacy")} sections={[
+      [t("privacy.s1.h"), <Bullets items={[t("privacy.s1.b1"), t("privacy.s1.b2"), t("privacy.s1.b3"), t("privacy.s1.b4"), t("privacy.s1.b5")]} />],
+      [t("privacy.s2.h"), <Bullets items={[t("privacy.s2.b1"), t("privacy.s2.b2"), t("privacy.s2.b3"), t("privacy.s2.b4"), t("privacy.s2.b5")]} />],
+      [t("privacy.s3.h"), <p>{t("privacy.s3.p")}</p>],
+      [t("privacy.s4.h"), <p>{t("privacy.s4.p")}</p>],
+      [t("privacy.s5.h"), <p>{t("privacy.s5.p")}</p>],
+      [t("privacy.s6.h"), <><p>{t("privacy.s6.p")}</p><Bullets items={[t("privacy.s6.b1"), t("privacy.s6.b2"), t("privacy.s6.b3")]} /></>],
+      [t("privacy.s7.h"), <p>{t("privacy.s7.p")}</p>],
+      [t("privacy.s8.h"), <p>{t("privacy.s8.p")}</p>],
     ]} />
   );
 }

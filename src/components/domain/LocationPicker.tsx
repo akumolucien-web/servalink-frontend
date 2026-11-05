@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SelectField, TextField, type Errors } from "../ui/Field";
-import { citiesOf, fold, quartiersOf, REGIONS } from "../../lib/locations";
+import { useLang, useT } from "../../i18n/I18nProvider";
+import { citiesOf, fold, quartiersOf, regionName, REGIONS } from "../../lib/locations";
 
 export interface LocationValue { region: string; city: string; quartier: string }
 const OTHER = "__other__";
@@ -10,39 +11,41 @@ export function LocationPicker({ value, onChange, level, errors = {}, disabled }
   value: LocationValue; onChange: (v: LocationValue) => void; level: "quartier" | "city";
   errors?: Errors<"region" | "city" | "quartier">; disabled?: boolean;
 }) {
+  const t = useT();
+  const { lang } = useLang();
   const quartiers = quartiersOf(value.region, value.city);
   const known = quartiers.some((q) => fold(q) === fold(value.quartier));
   const [typing, setTyping] = useState(false);
   const other = typing || (!!value.quartier && !known);
   return (
     <>
-      <SelectField label="Region" value={value.region} error={errors.region} disabled={disabled}
+      <SelectField label={t("loc.region")} value={value.region} error={errors.region} disabled={disabled}
         onChange={(e) => { setTyping(false); onChange({ region: e.target.value, city: "", quartier: "" }); }}>
-        <option value="">Select a region</option>
-        {REGIONS.map((r) => <option key={r.id} value={r.id}>{r.name_en} ({r.name_fr})</option>)}
+        <option value="">{t("loc.selectRegion")}</option>
+        {REGIONS.map((r) => <option key={r.id} value={r.id}>{regionName(r.id, lang)}</option>)}
       </SelectField>
       {value.region && (
-        <SelectField label="Town / city" value={value.city} error={errors.city} disabled={disabled}
+        <SelectField label={t("loc.city")} value={value.city} error={errors.city} disabled={disabled}
           onChange={(e) => { setTyping(false); onChange({ ...value, city: e.target.value, quartier: "" }); }}>
-          <option value="">Select a town or city</option>
+          <option value="">{t("loc.selectCity")}</option>
           {citiesOf(value.region).map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
         </SelectField>
       )}
       {level === "quartier" && value.region && value.city && (
         <>
-          <SelectField label="Quartier" value={other ? OTHER : known ? quartiers.find((q) => fold(q) === fold(value.quartier)) : ""}
+          <SelectField label={t("loc.quartier")} value={other ? OTHER : known ? quartiers.find((q) => fold(q) === fold(value.quartier)) : ""}
             error={errors.quartier} disabled={disabled}
             onChange={(e) => {
               const v = e.target.value;
               setTyping(v === OTHER);
               onChange({ ...value, quartier: v === OTHER ? "" : v });
             }}>
-            <option value="">Select a quartier</option>
+            <option value="">{t("loc.selectQuartier")}</option>
             {quartiers.map((q) => <option key={q} value={q}>{q}</option>)}
-            <option value={OTHER}>Other (type it)</option>
+            <option value={OTHER}>{t("loc.other")}</option>
           </SelectField>
           {other && (
-            <TextField label="Your quartier" value={value.quartier} maxLength={100} disabled={disabled}
+            <TextField label={t("loc.yourQuartier")} value={value.quartier} maxLength={100} disabled={disabled}
               onChange={(e) => onChange({ ...value, quartier: e.target.value })} />
           )}
         </>

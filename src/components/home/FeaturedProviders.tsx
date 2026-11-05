@@ -3,7 +3,7 @@ import { MapPin, Users } from "lucide-react";
 import { api, type ProviderCard } from "../../api";
 import { ButtonLink } from "../ui/Button";
 import { Avatar, EmptyState, ErrorState, RatingChip, Skeleton } from "../ui/Display";
-import { plural } from "../../lib/format";
+import { useT } from "../../i18n/I18nProvider";
 import { useResource } from "../../lib/useResource";
 import { CategoryIcon } from "../domain/CategoryIcon";
 
@@ -11,6 +11,7 @@ import { CategoryIcon } from "../domain/CategoryIcon";
 const FEATURED_COUNT = 6;
 
 function FeaturedCard({ provider }: { provider: ProviderCard }) {
+  const t = useT();
   // Real work photo from the provider's own gallery; any failure just falls back to the avatar block.
   const gallery = useResource(() => api.providerGallery(provider.provider_id), [provider.provider_id]);
   const photo = gallery.data?.find((item) => item.photo_url)?.photo_url ?? null;
@@ -19,7 +20,7 @@ function FeaturedCard({ provider }: { provider: ProviderCard }) {
     <article className="home-provider" aria-label={title}>
       <div className="home-provider-media">
         {photo
-          ? <img src={photo} alt={`Example of work by ${provider.name}`} loading="lazy" decoding="async" />
+          ? <img src={photo} alt={t("feat.workAlt", { name: provider.name })} loading="lazy" decoding="async" />
           : (
             <div className="home-provider-fallback" aria-hidden="true">
               <Avatar name={provider.name} src={provider.photo_url} size={64} />
@@ -39,10 +40,10 @@ function FeaturedCard({ provider }: { provider: ProviderCard }) {
         {provider.review_count > 0 && (
           <p className="row" style={{ gap: 10 }}>
             <RatingChip rating={provider.overall_rating} />
-            <span className="muted small">{plural(provider.review_count, "review")}</span>
+            <span className="muted small">{t(provider.review_count === 1 ? "common.reviews.one" : "common.reviews.other", { n: provider.review_count })}</span>
           </p>
         )}
-        <ButtonLink to={`/providers/${provider.provider_id}`} variant="secondary" size="sm" aria-label={`View Profile of ${provider.name}`}>View Profile</ButtonLink>
+        <ButtonLink to={`/providers/${provider.provider_id}`} variant="secondary" size="sm" aria-label={t("common.viewProfileOf", { name: provider.name })}>{t("common.viewProfile")}</ButtonLink>
       </div>
     </article>
   );
@@ -53,6 +54,7 @@ function FeaturedCard({ provider }: { provider: ProviderCard }) {
  * approved providers in the API's order (GET /providers sorts by provider id). Nothing here is invented.
  */
 export function FeaturedProviders() {
+  const t = useT();
   const providers = useResource(() => api.providers({ limit: FEATURED_COUNT }), []);
   const list = providers.data ?? [];
   return (
@@ -60,20 +62,20 @@ export function FeaturedProviders() {
       <div className="home-wrap">
         <div className="home-head row-between">
           <div>
-            <h2 id="featured-title">Meet Local Professionals</h2>
-            <p>Explore service providers available in your area.</p>
+            <h2 id="featured-title">{t("feat.title")}</h2>
+            <p>{t("feat.sub")}</p>
           </div>
-          <Link to="/search" className="small nowrap">Browse all providers</Link>
+          <Link to="/search" className="small nowrap">{t("common.browseAll")}</Link>
         </div>
         {providers.loading && !providers.data ? (
           <div className="home-provider-grid" aria-busy="true">{Array.from({ length: 3 }, (_, i) => <Skeleton key={i} height={300} radius={16} />)}</div>
         ) : providers.error ? (
-          <div className="card"><ErrorState error={providers.error} onRetry={providers.reload} title="We couldn't load providers" /></div>
+          <div className="card"><ErrorState error={providers.error} onRetry={providers.reload} title={t("feat.error")} /></div>
         ) : list.length === 0 ? (
           <div className="card">
-            <EmptyState icon={<Users size={24} />} title="No providers are listed yet"
-              action={<ButtonLink to="/become-provider" size="sm">Become a Provider</ButtonLink>}>
-              Approved providers appear here as they join ServaLink.
+            <EmptyState icon={<Users size={24} />} title={t("feat.emptyTitle")}
+              action={<ButtonLink to="/become-provider" size="sm">{t("common.becomeProvider")}</ButtonLink>}>
+              {t("feat.emptyText")}
             </EmptyState>
           </div>
         ) : (

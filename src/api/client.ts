@@ -1,9 +1,11 @@
 import { config } from "../config/env";
+import { translateApiMessage } from "../i18n/apiMessages";
+import { getLang } from "../i18n/core";
 
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
-    super(message);
+    super(translateApiMessage(message, getLang())); // text is shown to users, so it follows the active language
     this.status = status;
   }
 }

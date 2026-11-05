@@ -1,5 +1,7 @@
 import { useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { getLang, translate } from "../../i18n/core";
+import { useT } from "../../i18n/I18nProvider";
 
 interface FieldShellProps {
   label: string;
@@ -10,9 +12,10 @@ interface FieldShellProps {
 }
 
 function Shell({ id, label, hint, error, optional, className, children }: FieldShellProps & { id: string; children: ReactNode }) {
+  const t = useT();
   return (
     <div className={["field", className].filter(Boolean).join(" ")}>
-      <label htmlFor={id}>{label}{optional && <span className="optional"> (optional)</span>}</label>
+      <label htmlFor={id}>{label}{optional && <span className="optional"> {t("common.optional")}</span>}</label>
       {children}
       {hint && !error && <p className="field-hint" id={`${id}-hint`}>{hint}</p>}
       {error && <p className="field-error" id={`${id}-error`} role="alert"><AlertCircle size={14} aria-hidden="true" />{error}</p>}
@@ -35,12 +38,13 @@ export function TextField({ label, hint, error, optional, className, ...rest }: 
 export function PasswordField({ label, hint, error, className, ...rest }: FieldShellProps & Omit<InputHTMLAttributes<HTMLInputElement>, "type">) {
   const id = useId();
   const [visible, setVisible] = useState(false);
+  const t = useT();
   return (
     <Shell id={id} {...{ label, hint, error, className }}>
       <div className="input-wrap">
         <input id={id} className="input" type={visible ? "text" : "password"} aria-invalid={!!error || undefined}
           aria-describedby={describe(id, hint, error)} {...rest} />
-        <button type="button" onClick={() => setVisible((v) => !v)} aria-label={visible ? "Hide password" : "Show password"}>
+        <button type="button" onClick={() => setVisible((v) => !v)} aria-label={visible ? t("common.hidePassword") : t("common.showPassword")}>
           {visible ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
@@ -72,5 +76,5 @@ export const hasErrors = (errors: object) => Object.keys(errors).length > 0;
 export const isEmail = (value: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value.trim());
 export const passwordProblem = (value: string): string | undefined =>
   value.length < 8 || !/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/\d/.test(value)
-    ? "Use at least 8 characters with an uppercase letter, a lowercase letter and a number."
+    ? translate(getLang(), "auth.passwordWeak")
     : undefined;

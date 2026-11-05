@@ -92,3 +92,10 @@
 .crumbs { display: flex; gap: 8px; align-items: center; color: var(--text-muted); font-size: var(--fs-small); margin-bottom: 16px; flex-wrap: wrap; }
 .cta-card { background: linear-gradient(135deg, var(--green-700), var(--green-900)); color: #fff; border-radius: var(--radius-lg); padding: 28px; display: grid; gap: 14px; justify-items: start; }
 .cta-card p { color: #d1fae5; }
+
+/* Language switch (FR | EN) */
+.lang-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); padding: 2px; flex: none; }
+.lang-switch button { border: 0; background: transparent; color: var(--text); font: inherit; font-size: var(--fs-small); font-weight: 600; padding: 4px 10px; min-height: 32px; border-radius: 999px; cursor: pointer; }
+.lang-switch button:hover { background: var(--surface-muted); }
+.lang-switch button.active { background: var(--green-700); color: #fff; }
+.auth-lang { display: flex; justify-content: flex-end; margin-bottom: 8px; }

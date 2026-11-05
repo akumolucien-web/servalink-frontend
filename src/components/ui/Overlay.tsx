@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { CheckCircle2, CircleAlert, X } from "lucide-react";
+import { useT } from "../../i18n/I18nProvider";
 import { Button } from "./Button";
 
 /* ---------------- Modal (native <dialog>: focus trap, Esc and backdrop built in) ---------------- */
@@ -7,6 +8,7 @@ import { Button } from "./Button";
 export function Modal({ open, title, onClose, children, footer, wide }: {
   open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean;
 }) {
+  const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -22,7 +24,7 @@ export function Modal({ open, title, onClose, children, footer, wide }: {
         <>
           <div className="modal-head">
             <h3 id="modal-title">{title}</h3>
-            <button className="icon-btn" style={{ width: 32, height: 32, border: 0 }} onClick={onClose} aria-label="Close"><X size={18} /></button>
+            <button className="icon-btn" style={{ width: 32, height: 32, border: 0 }} onClick={onClose} aria-label={t("common.close")}><X size={18} /></button>
           </div>
           {children}
           {footer && <div className="modal-foot">{footer}</div>}
@@ -62,6 +64,7 @@ export function useToast(): Toasts {
 }
 
 export function OverlayProvider({ children }: { children: ReactNode }) {
+  const t = useT();
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [pending, setPending] = useState<(ConfirmOptions & { resolve: (value: boolean) => void }) | null>(null);
   const nextId = useRef(1);
@@ -88,7 +91,7 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
         {children}
         <Modal open={!!pending} title={pending?.title ?? ""} onClose={() => settle(false)}
           footer={<>
-            <Button variant="ghost" onClick={() => settle(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => settle(false)}>{t("common.cancel")}</Button>
             <Button variant={pending?.tone === "danger" ? "danger" : "primary"} onClick={() => settle(true)} autoFocus>{pending?.confirmLabel}</Button>
           </>}>
           <div className="modal-body">{pending?.message}</div>
@@ -98,7 +101,7 @@ export function OverlayProvider({ children }: { children: ReactNode }) {
             <div key={toast.id} className={`toast ${toast.tone}`} role={toast.tone === "error" ? "alert" : "status"}>
               {toast.tone === "success" ? <CheckCircle2 size={18} /> : <CircleAlert size={18} />}
               <span>{toast.message}</span>
-              <button onClick={() => dismiss(toast.id)} aria-label="Dismiss"><X size={16} /></button>
+              <button onClick={() => dismiss(toast.id)} aria-label={t("common.dismiss")}><X size={16} /></button>
             </div>
           ))}
         </div>

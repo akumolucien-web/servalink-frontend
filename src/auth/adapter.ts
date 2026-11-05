@@ -1,3 +1,6 @@
+import { translateApiMessage } from "../i18n/apiMessages";
+import { getLang } from "../i18n/core";
+
 export interface AuthSession {
   idToken: string;
   sub: string;
@@ -11,7 +14,7 @@ export interface AuthSession {
 export class AuthError extends Error {
   code: string;
   constructor(code: string, message: string) {
-    super(message);
+    super(translateApiMessage(message, getLang()));
     this.code = code;
   }
 }

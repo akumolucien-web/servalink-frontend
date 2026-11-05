@@ -6,11 +6,13 @@ import { ButtonLink, Button } from "../components/ui/Button";
 import { EmptyState, Skeleton } from "../components/ui/Display";
 import { useToast } from "../components/ui/Overlay";
 import { landingAfterLogin } from "../lib/redirect";
+import { useT } from "../i18n/I18nProvider";
 import { useAuth } from "./AuthContext";
 
 export function FullPageLoading() {
+  const t = useT();
   return (
-    <div style={{ minHeight: "60vh", display: "grid", placeItems: "center" }} role="status" aria-label="Loading">
+    <div style={{ minHeight: "60vh", display: "grid", placeItems: "center" }} role="status" aria-label={t("common.loading")}>
       <div style={{ width: "min(360px, 80vw)" }} className="stack"><Skeleton height={22} width="50%" /><Skeleton height={14} /><Skeleton height={14} width="80%" /></div>
     </div>
   );

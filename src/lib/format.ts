@@ -1,29 +1,34 @@
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { getLang, translate, type Lang } from "../i18n/core";
+
+const MONTHS: Record<Lang, string[]> = {
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  fr: ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."],
+};
 
 /** ISO timestamp from the backend (UTC) shown in the viewer's locale. */
-export function formatDateTime(iso?: string): string {
+export function formatDateTime(iso?: string, lang: Lang = getLang()): string {
   if (!iso) return "";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}, ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  return `${date.getDate()} ${MONTHS[lang][date.getMonth()]} ${date.getFullYear()}, ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
-export function formatDate(iso?: string): string {
+export function formatDate(iso?: string, lang: Lang = getLang()): string {
   if (!iso) return "";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+  return `${date.getDate()} ${MONTHS[lang][date.getMonth()]} ${date.getFullYear()}`;
 }
 
 /**
  * booking_date is an opaque local datetime string "YYYY-MM-DDTHH:mm" chosen by the
  * citizen. It is formatted from its parts, never through Date, so no timezone shift.
  */
-export function formatBookingDate(value?: string): string {
+export function formatBookingDate(value?: string, lang: Lang = getLang()): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value ?? "");
   if (!match) return value ?? "";
   const [, y, m, d, hh, mm] = match;
-  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}, ${hh}:${mm}`;
+  return `${Number(d)} ${MONTHS[lang][Number(m) - 1]} ${y}, ${hh}:${mm}`;
 }
 
 /** Value for <input type="datetime-local"> min: now, in local time, rounded up to the next hour. */
@@ -56,6 +61,6 @@ export function plural(count: number, one: string, many = one + "s"): string {
 
 /** "5 000 FCFA"; a regular space separator (toLocaleString varies by browser). No price means "Price on request". */
 export function formatFcfa(n?: number | null): string {
-  if (n == null) return "Price on request";
+  if (n == null) return translate(getLang(), "common.priceOnRequest");
   return `${String(Math.round(n)).replace(/\B(?=(\d{3})+$)/g, " ")} FCFA`;
 }
