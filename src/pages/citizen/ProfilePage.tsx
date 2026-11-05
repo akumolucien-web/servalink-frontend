@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiError, uploadImage } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
 import { LocationPicker } from "../../components/domain/LocationPicker";
@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/Button";
 import { Avatar, Banner, PageHeader } from "../../components/ui/Display";
 import { hasErrors, SelectField, TextField, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
+import { translate } from "../../i18n/core";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDate } from "../../lib/format";
 import { citiesOf, fold } from "../../lib/locations";
@@ -26,8 +27,11 @@ export function ProfilePage() {
   const [errors, setErrors] = useState<Errors<"full_name" | "region" | "city" | "phone" | "terms" | "form">>({});
   const [busy, setBusy] = useState(false);
 
+  const hydrated = useRef(false);
   useEffect(() => {
-    if (!profile) return;
+    // Fill the form once. Later profile changes (a language switch saves the profile) must not wipe what the user is typing.
+    if (!profile || hydrated.current) return;
+    hydrated.current = true;
     const region = profile.region ?? "";
     // Use the dataset spelling of the saved city so the select shows it.
     const city = citiesOf(region).find((c) => fold(c.name) === fold(profile.city))?.name ?? (region ? "" : profile.city);
@@ -54,7 +58,7 @@ export function ProfilePage() {
     try {
       const profile_image_key = photo ? await uploadImage(photo, "PROFILE_IMAGE") : undefined;
       await saveProfile({
-        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms,
+        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms, language: lang,
         ...(needsTerms ? { accept_terms: true } : {}),
         ...(profile_image_key ? { profile_image_key } : {}),
       });
@@ -76,7 +80,7 @@ export function ProfilePage() {
             <TextField label={t("auth.phone")} type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <div className="form-grid"><LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} /></div>
-          <SelectField label={t("lang.label")} value={lang} onChange={(e) => setLang(e.target.value as typeof lang)}>
+          <SelectField label={t("lang.label")} value={lang} onChange={async (e) => { const next = e.target.value as typeof lang; if (!(await setLang(next))) toast.error(translate(next, "prof.failed")); }}>
             {LANGUAGES.map(({ code, name }) => <option key={code} value={code} lang={code}>{name}</option>)}
           </SelectField>
           <label className="check">

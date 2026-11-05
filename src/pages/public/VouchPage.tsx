@@ -84,9 +84,9 @@ export function VouchPage() {
         <TextField label={t("vouch.pub.code")} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} error={errors.code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
 
-        <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset style={{ border: 0, padding: 0, margin: 0 }} aria-describedby={errors.rating ? "vouch-rating-error" : undefined}>
           <legend className="field-label" style={{ marginBottom: 8 }}>{t("vouch.pub.how")}</legend>
-          <div className="rating-picker" role="radiogroup" aria-label={t("vouch.pub.ratingAria")}>
+          <div className="rating-picker">
             {RATING_ORDER.map((value) => (
               <label className="rating-option" key={value}>
                 <input type="radio" name="rating" value={value} checked={rating === value} onChange={() => { setRating(value); setErrors((e) => ({ ...e, rating: undefined })); }} />
@@ -94,7 +94,7 @@ export function VouchPage() {
               </label>
             ))}
           </div>
-          {errors.rating && <p className="field-error" role="alert" style={{ marginTop: 6 }}>{errors.rating}</p>}
+          {errors.rating && <p className="field-error" id="vouch-rating-error" role="alert" style={{ marginTop: 6 }}>{errors.rating}</p>}
         </fieldset>
         <TextAreaField label={t("vouch.pub.comment")} optional maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} />
 

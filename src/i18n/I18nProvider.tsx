@@ -4,7 +4,8 @@ import { applyLang, getLang, hasStoredLang, translate, type Key, type Lang, type
 
 export type { Lang, Key };
 
-interface I18nValue { lang: Lang; setLang: (lang: Lang) => void }
+/** setLang resolves false only when saving the choice to the profile failed (the language still changes on this device). */
+interface I18nValue { lang: Lang; setLang: (lang: Lang) => Promise<boolean> }
 const Context = createContext<I18nValue | null>(null);
 
 /** Provides the active language. Must sit inside AuthProvider: a signed-in user's choice is saved to their profile. */
@@ -14,17 +15,23 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const profileRef = useRef(profile);
   profileRef.current = profile;
 
-  const setLang = useCallback((next: Lang) => {
+  const setLang = useCallback(async (next: Lang): Promise<boolean> => {
     applyLang(next);
     setLangState(next);
     const current = profileRef.current;
     // PUT /profile needs the full profile; skip legacy records that have no region yet.
     if (current && current.region && current.language !== next) {
-      void saveProfile({
-        full_name: current.full_name, region: current.region, city: current.city, phone: current.phone,
-        quartier: current.quartier ?? "", language: next,
-      }).catch(() => { console.warn("Could not save the language to the profile; kept on this device."); });
+      try {
+        await saveProfile({
+          full_name: current.full_name, region: current.region, city: current.city, phone: current.phone,
+          quartier: current.quartier ?? "", language: next,
+        });
+      } catch {
+        console.warn("Could not save the language to the profile; kept on this device.");
+        return false;
+      }
     }
+    return true;
   }, [saveProfile]);
 
   // A user who has never picked a language on this device gets the one saved on their profile.

@@ -1,9 +1,9 @@
 import { getLang, type Lang } from "../i18n/core";
 
-const ym = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const ym = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
-/** Allowed job months ("YYYY-MM", comparable as text): this month back to 24 months ago. Same rule as the backend. */
-export const jobMonthBounds = (now = new Date()) => ({ min: ym(new Date(now.getFullYear(), now.getMonth() - 24, 1)), max: ym(now) });
+/** Allowed job months ("YYYY-MM", comparable as text): this month back to 24 months ago, in UTC like the backend. */
+export const jobMonthBounds = (now = new Date()) => ({ min: ym(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 24, 1))), max: ym(now) });
 
 export function isValidJobMonth(value: string, now = new Date()): boolean {
   const { min, max } = jobMonthBounds(now);

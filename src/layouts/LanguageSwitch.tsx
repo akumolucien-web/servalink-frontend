@@ -13,7 +13,7 @@ export function LanguageSwitch() {
     <div className="lang-switch" role="group" aria-label={t("lang.label")}>
       {OPTIONS.map(({ code, label, name }) => (
         <button key={code} type="button" lang={code} aria-label={name} aria-pressed={lang === code}
-          className={lang === code ? "active" : undefined} onClick={() => setLang(code)}>{label}</button>
+          className={lang === code ? "active" : undefined} onClick={() => void setLang(code)}>{label}</button>
       ))}
     </div>
   );

@@ -3,12 +3,18 @@ import { translate } from "../i18n/core";
 import { isValidJobMonth, jobMonthBounds } from "./vouch";
 import { ratingLabel, RATING_ORDER } from "./status";
 
-const now = new Date(2026, 10, 5); // 5 Nov 2026
+const now = new Date(Date.UTC(2026, 10, 5)); // 5 Nov 2026
 
 describe("job month", () => {
   it("accepts this month and up to 24 months back", () => {
     expect(jobMonthBounds(now)).toEqual({ min: "2024-11", max: "2026-11" });
     for (const ok of ["2026-11", "2026-01", "2025-06", "2024-11"]) expect(isValidJobMonth(ok, now), ok).toBe(true);
+  });
+  it("follows UTC, so late on 31 Oct (UTC) November is still the future", () => {
+    const lateOct = new Date("2026-10-31T23:30:00Z");
+    expect(jobMonthBounds(lateOct)).toEqual({ min: "2024-10", max: "2026-10" });
+    expect(isValidJobMonth("2026-10", lateOct)).toBe(true);
+    expect(isValidJobMonth("2026-11", lateOct)).toBe(false);
   });
   it("rejects the future, older than 24 months and malformed values", () => {
     for (const bad of ["2026-12", "2027-01", "2024-10", "2020-05", "2026-13", "2026-00", "2026-1", "nov 2026", ""]) expect(isValidJobMonth(bad, now), bad).toBe(false);

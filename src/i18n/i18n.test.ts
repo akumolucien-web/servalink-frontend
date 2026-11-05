@@ -61,7 +61,7 @@ describe("translateApiMessage", () => {
       "This service is not available", "You cannot book your own service", "Action is not allowed from the current booking status",
       "Resource changed; refresh and retry", "language must be fr or en", "notify_sms must be true or false",
       "You can't vouch for yourself", "You already have 5 vouch requests waiting", "This client has already vouched 3 times this year",
-      "This vouch link is invalid or has expired", "Too many codes requested", "Too many attempts",
+      "This vouch link is invalid or has expired", "Verify your phone number first", "Too many codes requested", "Too many attempts",
       "Use a Cameroon mobile number, e.g. +237 6 77 12 34 56",
     ]) expect(translateApiMessage(message, "fr"), message).not.toBe(message);
   });

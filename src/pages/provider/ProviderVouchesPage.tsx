@@ -57,7 +57,7 @@ export function ProviderVouchesPage() {
       <div className="stack">
         <Banner>{t("vp.smsNote")}</Banner>
 
-        {created && (
+        <div role="status">{created && (
           <section className="card card-pad stack-sm" aria-label={t("vp.readyTitle", { name: created.vouch.client_name })}>
             <h2 style={{ fontSize: "1.0625rem" }}>{t("vp.readyTitle", { name: created.vouch.client_name })}</h2>
             <p className="muted small">{t("vp.readyText")}</p>
@@ -70,7 +70,7 @@ export function ProviderVouchesPage() {
               <Button variant="secondary" icon={<Copy size={16} />} onClick={copy}>{t("vp.copy")}</Button>
             </div>
           </section>
-        )}
+        )}</div>
 
         <form className="card card-pad stack" onSubmit={submit} noValidate aria-label={t("vp.formTitle")} style={{ maxWidth: 680 }}>
           <h2 style={{ fontSize: "1.0625rem" }}>{t("vp.formTitle")}</h2>
