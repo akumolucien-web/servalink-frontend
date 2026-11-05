@@ -34,6 +34,12 @@ export const REQUEST_STATUS: Record<CategoryRequestStatus, { label: Key; tone: T
   REJECTED: { label: "status.request.REJECTED", tone: "red" },
 };
 
+const UNKNOWN_STATUS: { label: Key; tone: Tone } = { label: "common.unknown", tone: "slate" };
+/** Looks a status up in one of the maps above; a value the frontend does not know yet shows as "Unknown" instead of crashing. */
+export function statusOf<S extends string>(map: Record<S, { label: Key; tone: Tone }>, status: S | string | null | undefined): { label: Key; tone: Tone } {
+  return status && Object.prototype.hasOwnProperty.call(map, status) ? map[status as S] : UNKNOWN_STATUS;
+}
+
 /** Backend value -> UI label (BAD/GOOD/VERY_GOOD/EXCELLENT; never stars or numbers). */
 export const RATING_LABEL: Record<Rating, string> = {
   BAD: "Bad", GOOD: "Good", VERY_GOOD: "V.Good", EXCELLENT: "Excellent",

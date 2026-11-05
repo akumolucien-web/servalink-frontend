@@ -6,7 +6,7 @@ import { Avatar, EmptyState, ErrorState, PageHeader, Skeleton, StatCard, StatusB
 import { ButtonLink } from "../../components/ui/Button";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatBookingDate, greetingTitle } from "../../lib/format";
-import { BOOKING_STATUS } from "../../lib/status";
+import { BOOKING_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function ProviderDashboardPage() {
@@ -51,7 +51,7 @@ export function ProviderDashboardPage() {
                     <Avatar name={b.citizen_name} size={40} />
                     <span><strong>{b.citizen_name}</strong><br /><span className="muted small">{b.category_name} · {formatBookingDate(b.booking_date)}</span></span>
                   </span>
-                  <StatusBadge label={t(BOOKING_STATUS[b.status].label)} tone={BOOKING_STATUS[b.status].tone} />
+                  <StatusBadge label={t(statusOf(BOOKING_STATUS, b.status).label)} tone={statusOf(BOOKING_STATUS, b.status).tone} />
                 </Link>
               ))}
       </section>

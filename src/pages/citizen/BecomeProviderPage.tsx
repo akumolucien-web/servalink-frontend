@@ -8,7 +8,7 @@ import { hasErrors, SelectField, TextAreaField, TextField, type Errors } from ".
 import { Modal, useToast } from "../../components/ui/Overlay";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { categoryLabel, formatDateTime } from "../../lib/format";
-import { PROVIDER_STATUS, REQUEST_STATUS } from "../../lib/status";
+import { PROVIDER_STATUS, REQUEST_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function BecomeProviderPage() {
@@ -18,7 +18,7 @@ export function BecomeProviderPage() {
   const [checking, setChecking] = useState(false);
 
   if (provider) {
-    const status = PROVIDER_STATUS[provider.status];
+    const status = statusOf(PROVIDER_STATUS, provider.status);
     const check = async () => {
       setChecking(true);
       await reloadAccount();
@@ -65,7 +65,7 @@ export function BecomeProviderPage() {
 
 function ApplicationSummary({ provider }: { provider: ProviderRecord }) {
   const t = useT();
-  const status = PROVIDER_STATUS[provider.status];
+  const status = statusOf(PROVIDER_STATUS, provider.status);
   return (
     <section className="card card-pad stack" aria-label={t("bpg.details")}>
       <div className="row-between"><h3 style={{ fontSize: "1rem" }}>{t("bpg.yourApp")}</h3><StatusBadge label={t(status.label)} tone={status.tone} /></div>
@@ -158,7 +158,7 @@ function ApplicationForm({ defaultPhone, city }: { defaultPhone: string; city: s
             {requests.data!.map((r) => (
               <div className="row-between" key={r.request_id}>
                 <span className="small">{r.proposed_name}</span>
-                <StatusBadge label={t(REQUEST_STATUS[r.status].label)} tone={REQUEST_STATUS[r.status].tone} />
+                <StatusBadge label={t(statusOf(REQUEST_STATUS, r.status).label)} tone={statusOf(REQUEST_STATUS, r.status).tone} />
               </div>
             ))}
             <p className="muted xs">{t("bpg.approvedAppear")}</p>

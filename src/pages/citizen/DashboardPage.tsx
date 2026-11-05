@@ -6,7 +6,7 @@ import { ButtonLink } from "../../components/ui/Button";
 import { Avatar, Banner, EmptyState, PageHeader, Skeleton, StatCard, StatusBadge } from "../../components/ui/Display";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDateTime, greetingTitle } from "../../lib/format";
-import { ACTIVE_BOOKING, BOOKING_STATUS, PROVIDER_STATUS } from "../../lib/status";
+import { ACTIVE_BOOKING, BOOKING_STATUS, PROVIDER_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function DashboardPage() {
@@ -42,7 +42,7 @@ export function DashboardPage() {
       )}
       {provider && ["SUSPENDED", "BANNED", "REJECTED"].includes(provider.status) && (
         <Banner tone="warning" action={<ButtonLink to="/app/become-provider" size="sm" variant="secondary">{t("bk.viewDetails")}</ButtonLink>}>
-          <strong>{t("dash.providerStatus", { status: t(PROVIDER_STATUS[provider.status].label) })}</strong>
+          <strong>{t("dash.providerStatus", { status: t(statusOf(PROVIDER_STATUS, provider.status).label) })}</strong>
           <span>{t("dash.noTools")}</span>
         </Banner>
       )}
@@ -91,7 +91,7 @@ export function DashboardPage() {
                   <Avatar name={b.provider_name} size={40} />
                   <span><strong>{b.provider_name}</strong><br /><span className="muted small">{b.category_name} · {formatDateTime(b.created_at)}</span></span>
                 </span>
-                <StatusBadge label={t(BOOKING_STATUS[b.status].label)} tone={BOOKING_STATUS[b.status].tone} />
+                <StatusBadge label={t(statusOf(BOOKING_STATUS, b.status).label)} tone={statusOf(BOOKING_STATUS, b.status).tone} />
               </Link>
             ))}
           </section>

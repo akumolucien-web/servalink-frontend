@@ -5,7 +5,7 @@ import { api, ApiError, type Booking, type BookingAction } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
 import { useLang, useT, type Key } from "../../i18n/I18nProvider";
 import { formatBookingDate, formatDateTime } from "../../lib/format";
-import { BOOKING_STATUS } from "../../lib/status";
+import { BOOKING_STATUS, statusOf } from "../../lib/status";
 import { buildTimeline } from "../../lib/timeline";
 import { Button, ButtonLink } from "../ui/Button";
 import { Avatar, StatusBadge } from "../ui/Display";
@@ -125,7 +125,7 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
 export function BookingCard({ booking, onChanged }: { booking: Booking; onChanged: () => void | Promise<void> }) {
   const t = useT();
   const role = useBookingRole(booking);
-  const status = BOOKING_STATUS[booking.status];
+  const status = statusOf(BOOKING_STATUS, booking.status);
   const counterparty = role === "citizen" ? booking.provider_name : booking.citizen_name;
   return (
     <article className="card card-interactive booking-card" aria-label={t("bk.aria", { ref: booking.reference })}>

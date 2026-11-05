@@ -10,7 +10,7 @@ import { Tabs } from "../../components/ui/Tabs";
 import { useT } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { DECISIONS, type DecisionDef } from "../../lib/providerDecisions";
-import { PROVIDER_STATUS } from "../../lib/status";
+import { PROVIDER_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 type Tab = "PENDING" | "APPROVED" | "SUSPENDED" | "REJECTED" | "BANNED";
@@ -59,7 +59,7 @@ export function AdminProvidersPage() {
         ]} />
         {providers.loading && !providers.data ? <CardSkeleton rows={2} />
           : providers.error ? <ErrorState error={providers.error} onRetry={providers.reload} title={t("ap.error")} />
-            : shown.length === 0 ? <div className="card"><EmptyState icon={<Users size={24} />} title={t("ap.none", { status: t(PROVIDER_STATUS[tab].label).toLowerCase() })}>{t("ap.noneText")}</EmptyState></div>
+            : shown.length === 0 ? <div className="card"><EmptyState icon={<Users size={24} />} title={t("ap.none", { status: t(statusOf(PROVIDER_STATUS, tab).label).toLowerCase() })}>{t("ap.noneText")}</EmptyState></div>
               : (
                 <div className="card table-wrap">
                   <table className="table">
@@ -70,7 +70,7 @@ export function AdminProvidersPage() {
                           <td><div className="row" style={{ gap: 10, flexWrap: "nowrap" }}><Avatar name={p.name} size={36} /><span><strong>{p.name}</strong><br /><span className="muted xs">{p.email}</span></span></div></td>
                           <td>{p.service_category}<br /><span className="muted xs">{p.service_title}</span></td>
                           <td>{p.city}</td><td className="nowrap">{formatDateTime(p.created_at)}</td>
-                          <td><StatusBadge label={t(PROVIDER_STATUS[p.status].label)} tone={PROVIDER_STATUS[p.status].tone} /></td>
+                          <td><StatusBadge label={t(statusOf(PROVIDER_STATUS, p.status).label)} tone={statusOf(PROVIDER_STATUS, p.status).tone} /></td>
                           <td><Button size="sm" variant="secondary" onClick={() => setDetail(p)}>{t(DECISIONS[p.status].length ? "ad.review" : "ap.details")}</Button></td>
                         </tr>
                       ))}
@@ -87,7 +87,7 @@ export function AdminProvidersPage() {
         {detail && (
           <div className="modal-body form">
             <dl className="kv">
-              <dt>{t("f.status")}</dt><dd><StatusBadge label={t(PROVIDER_STATUS[detail.status].label)} tone={PROVIDER_STATUS[detail.status].tone} /></dd>
+              <dt>{t("f.status")}</dt><dd><StatusBadge label={t(statusOf(PROVIDER_STATUS, detail.status).label)} tone={statusOf(PROVIDER_STATUS, detail.status).tone} /></dd>
               <dt>{t("f.email")}</dt><dd>{detail.email}</dd><dt>{t("f.phone")}</dt><dd>{detail.phone || t("common.none")}</dd>
               <dt>{t("f.category")}</dt><dd>{detail.service_category}</dd><dt>{t("f.serviceTitle")}</dt><dd>{detail.service_title}</dd>
               <dt>{t("f.description")}</dt><dd style={{ whiteSpace: "pre-line" }}>{detail.description || t("common.none")}</dd>

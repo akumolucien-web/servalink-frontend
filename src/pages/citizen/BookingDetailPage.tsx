@@ -8,7 +8,7 @@ import { Avatar, CardSkeleton, EmptyState, ErrorState, StatusBadge } from "../..
 import { useT } from "../../i18n/I18nProvider";
 import { formatBookingDate, formatDateTime } from "../../lib/format";
 import { formatCmPhone, telUrl, whatsappUrl } from "../../lib/phone";
-import { BOOKING_STATUS } from "../../lib/status";
+import { BOOKING_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 import type { Booking } from "../../api";
 
@@ -33,7 +33,7 @@ export function BookingDetailPage() {
 function Detail({ booking, reload }: { booking: Booking; reload: () => Promise<void> }) {
   const t = useT();
   const role = useBookingRole(booking);
-  const status = BOOKING_STATUS[booking.status];
+  const status = statusOf(BOOKING_STATUS, booking.status);
   // The booking record has no service name; fetch it when the service is still listed.
   const service = useResource(() => api.service(booking.service_id).catch(() => null), [booking.service_id]);
   const backTo = role === "provider" ? "/app/provider/bookings" : "/app/bookings";

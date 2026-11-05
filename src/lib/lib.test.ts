@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { categoryLabel, formatBookingDate, formatFcfa, greeting, initials, nextHourLocal } from "./format";
 import { applyLang } from "../i18n/core";
-import { BOOKING_STATUS, RATING_LABEL, ratingRank, reportReasonLabel } from "./status";
+import { BOOKING_STATUS, RATING_LABEL, ratingRank, reportReasonLabel, statusOf } from "./status";
 import { translate } from "../i18n/core";
 import { buildTimeline } from "./timeline";
 
@@ -92,6 +92,14 @@ describe("French", () => {
     expect(greeting(new Date(2026, 0, 1, 9), "fr")).toBe("Bonjour");
     expect(greeting(new Date(2026, 0, 1, 20), "fr")).toBe("Bonsoir");
     expect(greeting(new Date(2026, 0, 1, 9), "en")).toBe("Good morning");
+  });
+
+  it("an unknown status falls back to Unknown instead of crashing", () => {
+    expect(statusOf(BOOKING_STATUS, "PENDING")).toBe(BOOKING_STATUS.PENDING);
+    for (const odd of ["ARCHIVED", "", undefined, null, "constructor"]) {
+      expect(statusOf(BOOKING_STATUS, odd)).toEqual({ label: "common.unknown", tone: "slate" });
+    }
+    expect(translate("fr", "common.unknown")).toBe("Inconnu");
   });
 
   it("report reasons are stored in English and shown in the active language", () => {

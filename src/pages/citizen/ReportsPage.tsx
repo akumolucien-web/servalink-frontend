@@ -9,7 +9,7 @@ import { Modal } from "../../components/ui/Overlay";
 import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { focusDomId, useFocusTarget } from "../../lib/useFocusTarget";
-import { REPORT_STATUS, reportReasonLabel } from "../../lib/status";
+import { REPORT_STATUS, reportReasonLabel, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function ReportsPage() {
@@ -51,7 +51,7 @@ export function ReportsPage() {
             <div className="stack">
               {reports.data!.map((report) => {
                 const booking = byId.get(report.booking_id);
-                const status = REPORT_STATUS[report.status];
+                const status = statusOf(REPORT_STATUS, report.status);
                 return (
                   <article id={focusDomId(report.report_id)} className={`card card-pad stack-sm${report.report_id === id ? " focus-target" : ""}`} key={report.report_id}>
                     <div className="row-between">

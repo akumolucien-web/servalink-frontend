@@ -10,7 +10,7 @@ import { useLang, useT, type Key } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { focusDomId, useFocusTarget } from "../../lib/useFocusTarget";
 import { SUSPEND } from "../../lib/providerDecisions";
-import { PROVIDER_STATUS, REPORT_STATUS, reportReasonLabel } from "../../lib/status";
+import { PROVIDER_STATUS, REPORT_STATUS, reportReasonLabel, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 type Action = "START_REVIEW" | "RESOLVE" | "DISMISS";
@@ -56,7 +56,7 @@ export function AdminReportsPage() {
             : (
               <div className="stack">
                 {reports.data!.map((report) => {
-                  const status = REPORT_STATUS[report.status];
+                  const status = statusOf(REPORT_STATUS, report.status);
                   const provider = byId.get(report.provider_id);
                   return (
                     <article id={focusDomId(report.report_id)} className={`card card-pad stack-sm${report.report_id === id ? " focus-target" : ""}`} key={report.report_id}>
@@ -72,7 +72,7 @@ export function AdminReportsPage() {
                       {provider && (
                         <div className="row small">
                           <span className="muted">{t("ar.providerStatus")}</span>
-                          <StatusBadge label={t(PROVIDER_STATUS[provider.status].label)} tone={PROVIDER_STATUS[provider.status].tone} />
+                          <StatusBadge label={t(statusOf(PROVIDER_STATUS, provider.status).label)} tone={statusOf(PROVIDER_STATUS, provider.status).tone} />
                         </div>
                       )}
                       <div className="report-foot">

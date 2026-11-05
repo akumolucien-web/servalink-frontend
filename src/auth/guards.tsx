@@ -63,28 +63,27 @@ export function GuestOnly() {
 /** Provider Tools: PROVIDER group in the token AND an APPROVED provider record. */
 export function RequireProviderTools() {
   const { hasProviderTools, needsSessionRefresh, provider, refreshSession } = useAuth();
+  const t = useT();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   if (hasProviderTools) return <Outlet />;
   if (needsSessionRefresh) {
     return (
-      <EmptyState icon={<RefreshCw size={24} />} title="You're approved. Refresh your access"
+      <EmptyState icon={<RefreshCw size={24} />} title={t("guard.approvedTitle")}
         action={<Button loading={busy} onClick={async () => {
           setBusy(true);
           const ok = await refreshSession();
           setBusy(false);
-          if (!ok) toast.error("Your access hasn't updated yet. Sign out and sign in again.");
-        }}>Refresh access</Button>}>
-        An administrator approved your provider application. Your current sign-in was issued before that, so refresh it to unlock Provider Tools.
+          if (!ok) toast.error(t("guard.stale"));
+        }}>{t("bpg.refreshAccess")}</Button>}>
+        {t("guard.approvedText")}
       </EmptyState>
     );
   }
   return (
-    <EmptyState icon={<Lock size={24} />} title="Provider Tools are locked"
-      action={<ButtonLink to="/app/become-provider">{provider ? "View application status" : "Become a provider"}</ButtonLink>}>
-      {provider
-        ? "Provider Tools unlock once your application is approved and active."
-        : "Apply to become a provider to list your services and receive booking requests."}
+    <EmptyState icon={<Lock size={24} />} title={t("guard.lockedTitle")}
+      action={<ButtonLink to="/app/become-provider">{provider ? t("dash.viewStatus") : t("bp.title")}</ButtonLink>}>
+      {t(provider ? "guard.lockedApplied" : "guard.lockedNew")}
     </EmptyState>
   );
 }

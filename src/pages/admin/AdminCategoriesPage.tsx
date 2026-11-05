@@ -9,7 +9,7 @@ import { Tabs } from "../../components/ui/Tabs";
 import { useT } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { focusDomId, useFocusTarget } from "../../lib/useFocusTarget";
-import { REQUEST_STATUS } from "../../lib/status";
+import { REQUEST_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function AdminCategoriesPage() {
@@ -78,7 +78,7 @@ export function AdminCategoriesPage() {
                           <strong>{r.proposed_name}</strong>
                           <div className="muted xs">{t("ac.requestedBy", { name: names.get(r.provider_id) ?? t("ac.aCustomer"), date: formatDateTime(r.created_at) })}</div>
                         </div>
-                        <StatusBadge label={t(REQUEST_STATUS[r.status].label)} tone={REQUEST_STATUS[r.status].tone} />
+                        <StatusBadge label={t(statusOf(REQUEST_STATUS, r.status).label)} tone={statusOf(REQUEST_STATUS, r.status).tone} />
                       </div>
                       <p className="small">{r.description}</p>
                       {r.status === "PENDING" && (

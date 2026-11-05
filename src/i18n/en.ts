@@ -562,7 +562,7 @@ export const en = {
   "bd.contactProvider": "Contact the provider",
   "bd.contactCustomer": "Contact the customer",
   "bd.call": "Call",
-  "bd.whatsappMessage": "Hello, about ServaLink booking {ref}",
+  "bd.whatsappMessage": "Bonjour / Hello, ServaLink - réservation / booking {ref}",
   "bd.noPhone": "No phone number on file for this person.",
   "bd.address": "Address",
   "bd.whereToGo": "Where to go",
@@ -846,4 +846,12 @@ export const en = {
   "ar.dismissTitle": "Dismiss this report?",
   "ar.dismissNote": "Reason for dismissing (shared with the customer)",
   "ar.dismissDone": "Report dismissed",
+
+  // --- auth guards ---
+  "guard.approvedTitle": "You're approved. Refresh your access",
+  "guard.stale": "Your access hasn't updated yet. Sign out and sign in again.",
+  "guard.approvedText": "An administrator approved your provider application. Your current sign-in was issued before that, so refresh it to unlock Provider Tools.",
+  "guard.lockedTitle": "Provider Tools are locked",
+  "guard.lockedApplied": "Provider Tools unlock once your application is approved and active.",
+  "guard.lockedNew": "Apply to become a provider to list your services and receive booking requests.",
 } as const;

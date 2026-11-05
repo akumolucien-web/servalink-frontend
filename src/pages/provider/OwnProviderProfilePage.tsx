@@ -7,7 +7,7 @@ import { Banner, PageHeader, StatusBadge } from "../../components/ui/Display";
 import { TextAreaField, TextField } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
 import { useT } from "../../i18n/I18nProvider";
-import { PROVIDER_STATUS } from "../../lib/status";
+import { PROVIDER_STATUS, statusOf } from "../../lib/status";
 
 /** Provider Profile (own): only service title and description are editable (PUT /provider). */
 export function OwnProviderProfilePage() {
@@ -21,7 +21,7 @@ export function OwnProviderProfilePage() {
     if (provider) setForm({ service_title: provider.service_title, description: provider.description ?? "" });
   }, [provider]);
   if (!provider) return null;
-  const status = PROVIDER_STATUS[provider.status];
+  const status = statusOf(PROVIDER_STATUS, provider.status);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();

@@ -5,7 +5,7 @@ import { Avatar, EmptyState, ErrorState, PageHeader, Skeleton, StatCard, StatusB
 import { ButtonLink } from "../../components/ui/Button";
 import { useT } from "../../i18n/I18nProvider";
 import { formatDate } from "../../lib/format";
-import { PROVIDER_STATUS } from "../../lib/status";
+import { PROVIDER_STATUS, statusOf } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function AdminDashboardPage() {
@@ -41,7 +41,7 @@ export function AdminDashboardPage() {
                         <tr key={p.provider_id}>
                           <td><div className="row" style={{ gap: 10, flexWrap: "nowrap" }}><Avatar name={p.name} size={32} /><span>{p.name}</span></div></td>
                           <td>{p.service_category}</td><td>{p.city}</td><td className="nowrap">{formatDate(p.created_at)}</td>
-                          <td><StatusBadge label={t(PROVIDER_STATUS[p.status].label)} tone={PROVIDER_STATUS[p.status].tone} /></td>
+                          <td><StatusBadge label={t(statusOf(PROVIDER_STATUS, p.status).label)} tone={statusOf(PROVIDER_STATUS, p.status).tone} /></td>
                           <td><ButtonLink size="sm" to="/admin/providers">{t("ad.review")}</ButtonLink></td>
                         </tr>
                       ))}
