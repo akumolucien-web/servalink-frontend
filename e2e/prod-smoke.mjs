@@ -10,7 +10,7 @@ console.log("home renders; local banner count:", banner);
 await page.getByLabel("Service category").waitFor();
 console.log("category select state:", await page.getByLabel("Service category").locator("option").first().innerText());
 await page.goto(base + "/login"); await page.getByRole("heading", { name: "Welcome back" }).waitFor();
-await page.getByLabel("Email").fill("nobody@example.com"); await page.getByLabel("Password", { exact: true }).fill("Passw0rd1");
+await page.getByLabel("Phone number").fill("600000999"); await page.getByLabel("Password", { exact: true }).fill("Passw0rd1");
 await page.getByRole("button", { name: "Login" }).click();
 const msg = await page.locator(".banner.danger").first().innerText({ timeout: 20000 }).catch(() => "(no error banner)");
 console.log("real Cognito rejects unknown user with:", JSON.stringify(msg));

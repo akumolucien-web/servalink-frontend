@@ -9,6 +9,7 @@ import { AttentionMenu } from "../components/domain/AttentionMenu";
 import { Brand, LocalModeBanner } from "../components/domain/Brand";
 import { usePopover } from "../components/domain/usePopover";
 import { Avatar } from "../components/ui/Display";
+import { formatCmPhone } from "../lib/phone";
 
 interface NavItem { to: string; label: string; icon: ReactNode; end?: boolean }
 const icon = (Icon: typeof Search) => <Icon size={19} aria-hidden="true" />;
@@ -48,7 +49,7 @@ function UserMenu() {
       </button>
       {open && (
         <div className="popover" style={{ width: 260 }}>
-          <div className="head"><div>{displayName}</div><div className="muted xs" style={{ fontWeight: 400 }}>{session?.email}</div></div>
+          <div className="head"><div>{displayName}</div><div className="muted xs" style={{ fontWeight: 400 }}>{session?.email || formatCmPhone(session?.phone ?? "")}</div></div>
           <Link className="item" to="/app/profile" onClick={() => setOpen(false)}>My profile</Link>
           <button className="item" onClick={async () => {
             // Leave the protected page first: signing out while still on it makes RequireAuth record it as ?next=.

@@ -37,6 +37,7 @@ export function createAmplifyAdapter(): AuthAdapter {
         return {
           idToken: id.toString(),
           sub: String(payload.sub),
+          phone: String(payload.phone_number ?? ""),
           email: String(payload.email ?? ""),
           groups: Array.isArray(groups) ? groups.map(String) : [],
         } satisfies AuthSession;
@@ -44,39 +45,42 @@ export function createAmplifyAdapter(): AuthAdapter {
         return null;
       }
     },
-    async signIn(email, password, remember) {
+    async signIn(username, password, remember) {
       try { localStorage.setItem(REMEMBER_KEY, remember ? "1" : "0"); } catch { /* storage unavailable */ }
       cognitoUserPoolsTokenProvider.setKeyValueStorage(remember ? defaultStorage : tabStorage);
       try {
         try {
-          await signIn({ username: email, password });
+          await signIn({ username, password });
         } catch (error) {
           if ((error as { name?: string }).name !== "UserAlreadyAuthenticatedException") throw error;
           await signOut();
-          await signIn({ username: email, password });
+          await signIn({ username, password });
         }
       } catch (error) { wrap(error); }
     },
-    async signUp(email, password) {
+    async signUp({ phone, password, fullName, email }) {
       try {
-        await signUp({ username: email, password, options: { userAttributes: { email } } });
+        await signUp({
+          username: phone, password,
+          options: { userAttributes: { phone_number: phone, name: fullName, ...(email ? { email } : {}) } },
+        });
       } catch (error) { wrap(error); }
     },
-    async confirmSignUp(email, code) {
-      try { await confirmSignUp({ username: email, confirmationCode: code.trim() }); } catch (error) { wrap(error); }
+    async confirmSignUp(username, code) {
+      try { await confirmSignUp({ username, confirmationCode: code.trim() }); } catch (error) { wrap(error); }
     },
-    async resendCode(email) {
-      try { await resendSignUpCode({ username: email }); } catch (error) { wrap(error); }
+    async resendCode(username) {
+      try { await resendSignUpCode({ username }); } catch (error) { wrap(error); }
     },
     async signOut() {
       try { await signOut(); } catch { /* already signed out */ }
     },
-    async forgotPassword(email) {
-      try { await resetPassword({ username: email }); } catch (error) { wrap(error); }
+    async forgotPassword(username) {
+      try { await resetPassword({ username }); } catch (error) { wrap(error); }
     },
-    async confirmForgotPassword(email, code, newPassword) {
+    async confirmForgotPassword(username, code, newPassword) {
       try {
-        await confirmResetPassword({ username: email, confirmationCode: code.trim(), newPassword });
+        await confirmResetPassword({ username, confirmationCode: code.trim(), newPassword });
       } catch (error) { wrap(error); }
     },
   };

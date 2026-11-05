@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Mail, Phone, User } from "lucide-react";
 import { withNext } from "../../lib/redirect";
-import { useAuth, rememberPendingProfile } from "../../auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
+import { rememberPendingProfile } from "../../auth/pendingProfile";
 import { AuthInput, AuthPasswordInput } from "../../components/auth/AuthFields";
 import { LegalLinks } from "../../components/domain/Legal";
 import { LocationPicker } from "../../components/domain/LocationPicker";
@@ -29,8 +30,8 @@ export function RegisterPage() {
   const validate = (): Errors<Key> => {
     const next: Errors<Key> = {};
     if (!form.name.trim()) next.name = "Enter your full name";
-    if (!isEmail(form.email)) next.email = "Enter a valid email address";
     if (!normalizeCmPhone(form.phone)) next.phone = "Enter a Cameroon number, e.g. 6 77 12 34 56";
+    if (form.email.trim() && !isEmail(form.email)) next.email = "Enter a valid email address";
     if (!form.region) next.region = "Select your region";
     if (form.region && !form.city) next.city = "Select your town or city";
     const problem = passwordProblem(form.password);
@@ -46,11 +47,12 @@ export function RegisterPage() {
     if (hasErrors(next) || !adapter) return;
     setBusy(true);
     try {
-      const email = form.email.trim().toLowerCase();
-      await adapter.signUp(email, form.password);
+      const phone = normalizeCmPhone(form.phone)!; // validated above
+      const email = form.email.trim().toLowerCase() || undefined;
+      await adapter.signUp({ phone, password: form.password, fullName: form.name.trim(), email });
       // Profile details are saved to ServaLink after the first login (PUT /profile needs a token).
-      rememberPendingProfile({ email, full_name: form.name.trim(), region: form.region, city: form.city, phone: form.phone.trim() });
-      navigate(withNext(`/verify?email=${encodeURIComponent(email)}`, nextPath));
+      rememberPendingProfile({ phone, full_name: form.name.trim(), region: form.region, city: form.city });
+      navigate(withNext(`/verify?phone=${encodeURIComponent(phone)}`, nextPath));
     } catch (error) {
       setErrors({ form: error instanceof Error ? error.message : "We couldn't create your account. Try again." });
       setBusy(false);
@@ -66,8 +68,8 @@ export function RegisterPage() {
           <Banner tone="danger" action={errors.form.includes("already exists") ? <Link className="small nowrap" to={withNext("/login", nextPath)}>Log in</Link> : undefined}>{errors.form}</Banner>
         )}
         <AuthInput label="Full name" icon={<User size={19} />} autoComplete="name" value={form.name} error={errors.name} onChange={set("name")} />
-        <AuthInput label="Email" placeholder="Email address" icon={<Mail size={19} />} type="email" autoComplete="email" value={form.email} error={errors.email} onChange={set("email")} />
         <AuthInput label="Phone number" placeholder="Phone (e.g. 6 77 12 34 56)" icon={<Phone size={19} />} type="tel" autoComplete="tel" value={form.phone} error={errors.phone} onChange={set("phone")} />
+        <AuthInput label="Email (optional)" placeholder="Email address" icon={<Mail size={19} />} type="email" autoComplete="email" value={form.email} error={errors.email} onChange={set("email")} />
         <LocationPicker level="city" value={{ region: form.region, city: form.city, quartier: "" }} errors={errors} onChange={(v) => { setForm((f) => ({ ...f, ...v })); setErrors((e) => ({ ...e, region: undefined, city: undefined })); }} />
         <AuthPasswordInput label="Password" autoComplete="new-password" value={form.password} error={errors.password}
           hint="At least 8 characters with uppercase, lowercase and a number." onChange={set("password")} />

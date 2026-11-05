@@ -50,7 +50,7 @@ await check("registration page renders", async () => {
 });
 await check("Cognito is configured: a sign-in for an unknown user gets a Cognito answer (not a config error)", async () => {
   await page.goto(`${SITE}/login`, { waitUntil: "networkidle" });
-  await page.getByLabel("Email").fill("smoke-test-nobody@example.invalid");
+  await page.getByLabel("Phone number").fill("600000999");
   await page.getByLabel("Password", { exact: true }).fill("Passw0rd1");
   await page.getByRole("button", { name: "Login" }).click();
   const banner = page.locator(".banner.danger").first();

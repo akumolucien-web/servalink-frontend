@@ -10,7 +10,7 @@ import { hasErrors, TextField, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
 import { formatDate } from "../../lib/format";
 import { citiesOf, fold } from "../../lib/locations";
-import { normalizeCmPhone } from "../../lib/phone";
+import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
 
 export function ProfilePage() {
   const { profile, saveProfile, session, hasProviderTools } = useAuth();
@@ -72,7 +72,7 @@ export function ProfilePage() {
             <TextField label="Phone number" type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <div className="form-grid"><LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} /></div>
-          <TextField label="Email" value={session?.email ?? ""} disabled readOnly hint="Your email is your login and can't be changed here." />
+          <TextField label="Email" value={session?.email ?? ""} disabled readOnly hint="Your email is optional and can't be changed here." />
           <ImagePicker label="Profile photo" file={photo} onChange={setPhoto}
             hint={profile?.profile_image_key ? "A photo is saved. Choose a new one to replace it." : "JPEG, PNG or WEBP, up to 10 MB."} />
           {needsTerms && <TermsCheckbox checked={agreed} error={errors.terms} onChange={setAgreed} />}
@@ -81,7 +81,7 @@ export function ProfilePage() {
         <aside className="card card-pad stack-sm" style={{ justifyItems: "start" }}>
           <Avatar name={profile?.full_name} src={ownPhoto} size={72} />
           <strong>{profile?.full_name}</strong>
-          <span className="muted small">{session?.email}</span>
+          <span className="muted small">{session?.email || formatCmPhone(session?.phone ?? "")}</span>
           {profile?.created_at && <span className="muted xs">Member since {formatDate(profile.created_at)}</span>}
         </aside>
       </div>

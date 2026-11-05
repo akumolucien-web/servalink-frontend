@@ -1,29 +1,31 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, KeyRound, Mail } from "lucide-react";
+import { ArrowRight, KeyRound, Phone } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { isLocalIntegration } from "../../config/env";
 import { AuthInput, AuthPasswordInput } from "../../components/auth/AuthFields";
 import { Button } from "../../components/ui/Button";
 import { Banner } from "../../components/ui/Display";
-import { isEmail, passwordProblem } from "../../components/ui/Field";
+import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
+import { passwordProblem } from "../../components/ui/Field";
 
 export function ForgotPasswordPage() {
   const { adapter } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState<"email" | "reset">("email");
-  const [email, setEmail] = useState("");
+  const [step, setStep] = useState<"phone" | "reset">("phone");
+  const [phoneInput, setPhoneInput] = useState("");
+  const phone = normalizeCmPhone(phoneInput);
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; code?: string; password?: string; form?: string }>({});
+  const [errors, setErrors] = useState<{ phone?: string; code?: string; password?: string; form?: string }>({});
   const [busy, setBusy] = useState(false);
 
   const requestCode = async (event: FormEvent) => {
     event.preventDefault();
-    if (!isEmail(email)) { setErrors({ email: "Enter a valid email address" }); return; }
+    if (!phone) { setErrors({ phone: "Enter a Cameroon number, e.g. 6 77 12 34 56" }); return; }
     setBusy(true); setErrors({});
     try {
-      await adapter!.forgotPassword(email.trim().toLowerCase());
+      await adapter!.forgotPassword(phone);
       setStep("reset");
     } catch (error) {
       setErrors({ form: error instanceof Error ? error.message : "We couldn't send a code." });
@@ -32,13 +34,13 @@ export function ForgotPasswordPage() {
 
   const reset = async (event: FormEvent) => {
     event.preventDefault();
-    const next = { code: code.trim() ? undefined : "Enter the code from your email", password: passwordProblem(password) };
+    const next = { code: code.trim() ? undefined : "Enter the 6-digit code from your SMS", password: passwordProblem(password) };
     setErrors(next);
-    if (next.code || next.password) return;
+    if (!phone || next.code || next.password) return;
     setBusy(true);
     try {
-      await adapter!.confirmForgotPassword(email.trim().toLowerCase(), code, password);
-      navigate(`/login?reset=1&email=${encodeURIComponent(email.trim())}`, { replace: true });
+      await adapter!.confirmForgotPassword(phone, code, password);
+      navigate(`/login?reset=1&phone=${encodeURIComponent(phone)}`, { replace: true });
     } catch (error) {
       setErrors({ form: error instanceof Error ? error.message : "We couldn't reset your password." });
       setBusy(false);
@@ -48,11 +50,11 @@ export function ForgotPasswordPage() {
   return (
     <section aria-labelledby="forgot-title">
       <h1 id="forgot-title" className="auth-title">Reset your password</h1>
-      <p className="auth-sub">{step === "email" ? "Enter your email and we'll send you a code." : `Enter the code we sent to ${email}.`}</p>
-      {step === "email" ? (
+      <p className="auth-sub">{step === "phone" ? "Enter your phone number and we'll send you a code by SMS." : `Enter the 6-digit code we sent by SMS to ${formatCmPhone(phone ?? "")}.`}</p>
+      {step === "phone" ? (
         <form className="auth-form" onSubmit={requestCode} noValidate>
           {errors.form && <Banner tone="danger">{errors.form}</Banner>}
-          <AuthInput label="Email" placeholder="Email address" icon={<Mail size={19} />} type="email" autoComplete="email" value={email} error={errors.email} onChange={(e) => setEmail(e.target.value)} />
+          <AuthInput label="Phone number" placeholder="Phone (e.g. 6 77 12 34 56)" icon={<Phone size={19} />} type="tel" autoComplete="tel" value={phoneInput} error={errors.phone} onChange={(e) => setPhoneInput(e.target.value)} />
           <Button type="submit" size="lg" block loading={busy} className="auth-submit">Send code {!busy && <ArrowRight size={19} aria-hidden="true" />}</Button>
           <p className="auth-back"><Link to="/login">Back to log in</Link></p>
         </form>

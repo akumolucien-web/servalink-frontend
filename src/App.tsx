@@ -10,7 +10,7 @@ import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { OnboardingPage } from "./pages/auth/OnboardingPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
-import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+import { VerifyCodePage } from "./pages/auth/VerifyCodePage";
 import { AdminCategoriesPage } from "./pages/admin/AdminCategoriesPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminProvidersPage } from "./pages/admin/AdminProvidersPage";
@@ -77,7 +77,7 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           </Route>
         </Route>
-        <Route element={<AuthShell />}><Route path="/verify" element={<VerifyEmailPage />} /></Route>
+        <Route element={<AuthShell />}><Route path="/verify" element={<VerifyCodePage />} /></Route>
 
         <Route element={<RequireAuth />}>
           <Route element={<AuthShell />}><Route path="/app/onboarding" element={<OnboardingPage />} /></Route>

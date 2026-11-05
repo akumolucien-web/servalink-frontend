@@ -4,22 +4,10 @@ import { configureClient } from "../api/client";
 import { isLocalIntegration } from "../config/env";
 import type { AuthAdapter, AuthSession } from "./adapter";
 import { createAmplifyAdapter } from "./amplifyAdapter";
+import { takePendingProfile } from "./pendingProfile";
+import { formatCmPhone } from "../lib/phone";
 
 type Status = "loading" | "anonymous" | "authenticated";
-
-interface PendingProfile { email: string; full_name: string; region: string; city: string; phone: string }
-const PENDING_KEY = "servalink.pendingProfile";
-
-export function rememberPendingProfile(profile: PendingProfile) {
-  try { localStorage.setItem(PENDING_KEY, JSON.stringify({ ...profile, email: profile.email.toLowerCase() })); } catch { /* ignore */ }
-}
-
-function takePendingProfile(email: string): PendingProfile | null {
-  try {
-    const value = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "null") as PendingProfile | null;
-    return value && value.email === email.toLowerCase() ? value : null;
-  } catch { return null; }
-}
 
 interface AuthValue {
   status: Status;
@@ -36,7 +24,7 @@ interface AuthValue {
   sessionExpired: boolean;
   displayName: string;
   adapter: AuthAdapter | null;
-  signIn: (email: string, password: string, remember: boolean) => Promise<void>;
+  signIn: (username: string, password: string, remember: boolean) => Promise<void>;
   signOut: () => Promise<void>;
   /** Re-issues the token so new Cognito groups apply, then reloads the account. */
   refreshSession: () => Promise<boolean>;
@@ -75,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const [loadedProfile, loadedProvider] = await Promise.all([api.profile(), api.myProvider()]);
       let finalProfile = loadedProfile;
       if (!finalProfile) {
-        // Registration data collected before email verification is saved on first login.
-        const pending = takePendingProfile(current.email);
+        // Registration data collected before SMS verification is saved on first login.
+        const pending = takePendingProfile(current.phone);
         if (pending) {
           try {
             finalProfile = await api.saveProfile({ full_name: pending.full_name, region: pending.region, city: pending.city, phone: pending.phone, accept_terms: true }); // consent line shown under "Create Account"
@@ -146,9 +134,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("visibilitychange", check);
   }, [provider?.status]);
 
-  const signIn = useCallback(async (email: string, password: string, remember: boolean) => {
+  const signIn = useCallback(async (username: string, password: string, remember: boolean) => {
     const current = adapterRef.current!;
-    await current.signIn(email, password, remember);
+    await current.signIn(username, password, remember);
     const fresh = await current.getSession();
     if (!fresh) throw new Error("Sign-in did not return a session.");
     setSessionExpired(false);
@@ -187,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status, session, profile, provider, accountLoading, isAdmin, adapter, sessionExpired,
       hasProviderTools: hasGroup && provider?.status === "APPROVED",
       needsSessionRefresh: provider?.status === "APPROVED" && !hasGroup,
-      displayName: profile?.full_name || (isAdmin ? "Admin" : session?.email ?? ""),
+      displayName: profile?.full_name || (isAdmin ? "Admin" : session?.email || formatCmPhone(session?.phone ?? "")),
       signIn, signOut, refreshSession, reloadAccount, saveProfile,
     };
   }, [status, session, profile, provider, accountLoading, isAdmin, adapter, sessionExpired, signIn, signOut, refreshSession, reloadAccount, saveProfile]);

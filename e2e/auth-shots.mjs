@@ -8,7 +8,7 @@ for (const [name, [width, height]] of Object.entries(sizes)) {
   const ctx = await browser.newContext({ viewport: { width, height } });
   const page = await ctx.newPage();
   const shots = [
-    ["login", "/login"], ["register", "/register"], ["verify", "/verify?email=test%40example.com"], ["forgot", "/forgot-password"],
+    ["login", "/login"], ["register", "/register"], ["verify", "/verify?phone=%2B237677123456"], ["forgot", "/forgot-password"],
   ];
   for (const [label, path] of shots) {
     await page.goto(APP + path, { waitUntil: "networkidle" });

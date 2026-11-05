@@ -45,8 +45,8 @@ function futureDate(days) {
 async function register(page, { name, email, city, phone }, { forceOnboarding = false } = {}) {
   await page.goto(`${APP}/register`);
   await page.getByLabel("Full name").fill(name);
-  await page.getByLabel("Email").fill(email);
   await page.getByLabel("Phone number").fill(phone);
+  await page.getByLabel("Email (optional)").fill(email);
   await page.getByLabel("Region").selectOption("SW"); // Buea is in the South-West
   await page.getByLabel("Town / city").selectOption(city);
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
@@ -54,9 +54,9 @@ async function register(page, { name, email, city, phone }, { forceOnboarding = 
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL(/\/verify/);
   await page.getByLabel("Verification code").fill("123456");
-  await page.getByRole("button", { name: "Verify email" }).click();
+  await page.getByRole("button", { name: "Verify" }).click();
   await page.waitForURL(/\/login/);
-  await page.getByText("Email verified").waitFor();
+  await page.getByText("Phone number verified").waitFor();
   if (forceOnboarding) await page.evaluate(() => localStorage.removeItem("servalink.pendingProfile"));
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: "Login" }).click();
@@ -119,7 +119,7 @@ async function main() {
       const { page } = anon;
       await page.goto(`${APP}/register`);
       await page.getByLabel("Full name").fill("Test User");
-      await page.getByLabel("Email").fill("bad-email");
+      await page.getByLabel("Email (optional)").fill("bad-email");
       await page.getByLabel("Password", { exact: true }).fill("short");
       await page.getByLabel("Confirm password").fill("different");
       await page.getByRole("button", { name: "Create account" }).click();
@@ -141,8 +141,8 @@ async function main() {
       await page.goto(`${APP}/app`);
       await page.waitForURL(/\/login\?next=/);                       // protected again after logout
       // Forgot password: request code, reset, then the new password works and the old one does not
-      await page.getByRole("link", { name: "Forgot Password?" }).click();
-      await page.getByLabel("Email").fill("recover@x.test");
+      await page.getByRole("link", { name: "Forgot password?" }).click();
+      await page.getByLabel("Phone number").fill("650 000 000");
       await page.getByRole("button", { name: "Send code" }).click();
       await page.getByLabel("Verification code").fill("000000");
       await page.getByLabel("New password").fill("NewPassw0rd2");
@@ -154,7 +154,7 @@ async function main() {
       await page.getByText("Password updated").waitFor();
       await page.getByLabel("Password", { exact: true }).fill(PASSWORD);   // the OLD password
       await page.getByRole("button", { name: "Login" }).click();
-      await page.getByText("Incorrect email or password").waitFor();
+      await page.getByText("Incorrect phone number or password").waitFor();
       await page.getByLabel("Password", { exact: true }).fill("NewPassw0rd2");
       await page.getByRole("button", { name: "Login" }).click();
       await page.waitForURL(/\/app$/);

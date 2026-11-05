@@ -10,7 +10,7 @@ import { Banner } from "../../components/ui/Display";
 import { hasErrors, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
 import { FullPageLoading } from "../../auth/guards";
-import { normalizeCmPhone } from "../../lib/phone";
+import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
 import { safeNext } from "../../lib/redirect";
 
 /** Shown when GET /profile returns 404: the account exists in Cognito but not yet in ServaLink. */
@@ -56,7 +56,7 @@ export function OnboardingPage() {
   return (
     <section aria-labelledby="onboarding-title">
       <h1 id="onboarding-title" className="auth-title">Finish setting up your profile</h1>
-      <p className="auth-sub">Signed in as {session?.email}. Tell us where you're based so providers know who they're helping.</p>
+      <p className="auth-sub">Signed in as {session?.email || formatCmPhone(session?.phone ?? "")}. Tell us where you're based so providers know who they're helping.</p>
       <form className="auth-form" onSubmit={submit} noValidate>
         {errors.form && <Banner tone="danger">{errors.form}</Banner>}
         <AuthInput label="Full name" icon={<User size={19} />} autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />

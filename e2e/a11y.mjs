@@ -20,7 +20,7 @@ async function scan(page, label) {
 
 const anon = (await context(browser)).newPage();
 const a = await anon;
-for (const [label, url] of [["home", "/"], ["search", "/search?category=Plumbing&city=Buea"], ["login", "/login"], ["register", "/register"], ["forgot-password", "/forgot-password"], ["verify-email", "/verify?email=a%40b.test"], ["become-provider", "/become-provider"]]) {
+for (const [label, url] of [["home", "/"], ["search", "/search?category=Plumbing&city=Buea"], ["login", "/login"], ["register", "/register"], ["forgot-password", "/forgot-password"], ["verify-email", "/verify?phone=%2B237677123456"], ["become-provider", "/become-provider"]]) {
   await a.goto(APP + url); await scan(a, label);
 }
 await a.getByRole("link", { name: "Log in" }).first().click().catch(() => {});

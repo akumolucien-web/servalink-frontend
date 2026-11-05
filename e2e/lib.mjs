@@ -31,9 +31,23 @@ export async function resetBackend(seed) {
   if (!response.ok) throw new Error("Could not reset the local backend. Is local_dev.server running?");
 }
 
-export async function login(page, email, password = PASSWORD) {
+// The sign-in form takes a phone number. The local simulator keys users as "<+237 phone>@phone.local"
+// (see src/auth/devAdapter.ts), so seeded people need a phone here. Pass a phone directly for anyone else.
+export const DEV_PHONES = {
+  "admin@servalink.test": "600000001",
+  "lucien@servalink.test": "600000002",
+  "marie@servalink.test": "600000003",
+  "lucien@home.test": "600000004",
+  "lucien@x.test": "677000111",
+  "marie@x.test": "650111222",
+  "recover@x.test": "650000000",
+};
+
+export async function login(page, who, password = PASSWORD) {
+  const phone = who.includes("@") ? DEV_PHONES[who] : who;
+  if (!phone) throw new Error(`No dev phone for ${who}; add it to DEV_PHONES in e2e/lib.mjs`);
   await page.goto(`${APP}/login`);
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Phone number").fill(phone);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Login" }).click();
   await page.waitForURL(/\/(app|admin)/);

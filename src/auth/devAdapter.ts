@@ -6,6 +6,12 @@ import { AuthError, friendlyAuthError, type AuthAdapter, type AuthSession } from
 
 const KEY = "servalink.dev.session";
 
+// The simulator (servalink-backend/local_dev) keys users by an e-mail-shaped string, so a phone
+// number maps to "+237XXXXXXXXX@phone.local". The simulator sends no SMS; the code is always 123456.
+const SUFFIX = "@phone.local";
+export const devKey = (phone: string) => `${phone}${SUFFIX}`;
+const phoneOf = (key: string) => (key.endsWith(SUFFIX) ? key.slice(0, -SUFFIX.length) : "");
+
 interface Stored { idToken: string; refreshToken: string; sub: string; email: string; groups: string[] }
 
 function read(): Stored | null {
@@ -47,19 +53,20 @@ export function createDevAdapter(): AuthAdapter {
           return null;
         }
       }
-      return { idToken: stored.idToken, sub: stored.sub, email: stored.email, groups: stored.groups } satisfies AuthSession;
+      const phone = phoneOf(stored.email);
+      return { idToken: stored.idToken, sub: stored.sub, phone, email: phone ? "" : stored.email, groups: stored.groups } satisfies AuthSession;
     },
-    async signIn(email, password) {
-      const session = await call<Stored>("signin", { email, password });
+    async signIn(username, password) {
+      const session = await call<Stored>("signin", { email: devKey(username), password });
       localStorage.setItem(KEY, JSON.stringify(session));
     },
-    async signUp(email, password) { await call("signup", { email, password }); },
-    async confirmSignUp(email, code) { await call("confirm", { email, code: code.trim() }); },
-    async resendCode(email) { await call("resend", { email }); },
+    async signUp({ phone, password }) { await call("signup", { email: devKey(phone), password }); },
+    async confirmSignUp(username, code) { await call("confirm", { email: devKey(username), code: code.trim() }); },
+    async resendCode(username) { await call("resend", { email: devKey(username) }); },
     async signOut() { localStorage.removeItem(KEY); },
-    async forgotPassword(email) { await call("forgot", { email }); },
-    async confirmForgotPassword(email, code, newPassword) {
-      await call("reset", { email, code: code.trim(), password: newPassword });
+    async forgotPassword(username) { await call("forgot", { email: devKey(username) }); },
+    async confirmForgotPassword(username, code, newPassword) {
+      await call("reset", { email: devKey(username), code: code.trim(), password: newPassword });
     },
   };
 }

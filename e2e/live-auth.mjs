@@ -32,10 +32,10 @@ for (const [tag, opts] of [["desktop", { viewport: { width: 1448, height: 1086 }
   if (tag === "desktop") {
     await check("password recovery: page renders and Cognito answers a reset request for an unknown address", async () => {
       await page.goto(SITE + "/login", { waitUntil: "networkidle" });
-      await page.getByRole("link", { name: "Forgot Password?" }).click();
+      await page.getByRole("link", { name: "Forgot password?" }).click();
       await page.getByRole("heading").first().waitFor();
       await page.waitForURL(/forgot-password/);
-      await page.getByLabel("Email").fill("smoke-test-nobody@example.invalid");
+      await page.getByLabel("Phone number").fill("600000999");
       await page.getByRole("button", { name: /send|reset|continue/i }).first().click();
       await page.waitForTimeout(4000);
       console.log("        page says:", JSON.stringify((await page.locator("main").innerText()).replace(/\s+/g, " ").slice(0, 160)));
