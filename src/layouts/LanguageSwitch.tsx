@@ -1,3 +1,4 @@
+import { useToast } from "../components/ui/Overlay";
 import { useLang, useT, type Lang } from "../i18n/I18nProvider";
 
 export const OPTIONS: { code: Lang; label: string; name: string }[] = [
@@ -9,11 +10,12 @@ export const OPTIONS: { code: Lang; label: string; name: string }[] = [
 export function LanguageSwitch() {
   const { lang, setLang } = useLang();
   const t = useT();
+  const toast = useToast();
   return (
     <div className="lang-switch" role="group" aria-label={t("lang.label")}>
       {OPTIONS.map(({ code, label, name }) => (
         <button key={code} type="button" lang={code} aria-label={name} aria-pressed={lang === code}
-          className={lang === code ? "active" : undefined} onClick={() => void setLang(code)}>{label}</button>
+          className={lang === code ? "active" : undefined} onClick={async () => { if (!(await setLang(code))) toast.error(t("lang.saveFailed")); }}>{label}</button>
       ))}
     </div>
   );

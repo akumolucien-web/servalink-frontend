@@ -58,7 +58,9 @@ export function ProfilePage() {
     try {
       const profile_image_key = photo ? await uploadImage(photo, "PROFILE_IMAGE") : undefined;
       await saveProfile({
-        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms, language: lang,
+        full_name: form.full_name.trim(), region: form.region, city: form.city, quartier: form.quartier.trim(), phone: form.phone.trim(), notify_sms: form.notify_sms,
+        // Only fill a missing language; never let this device's choice silently overwrite the account's.
+        ...(profile?.language ? {} : { language: lang }),
         ...(needsTerms ? { accept_terms: true } : {}),
         ...(profile_image_key ? { profile_image_key } : {}),
       });

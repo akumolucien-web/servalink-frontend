@@ -30,6 +30,7 @@ export const fr: Record<keyof typeof en, string> = {
   "brand.home": "Accueil ServaLink",
   "brand.tagline": "Les services locaux, plus près de vous",
   "lang.label": "Langue",
+  "lang.saveFailed": "Langue changée sur cet appareil, mais impossible de l'enregistrer sur votre compte.",
 
   // --- navigation / shell ---
   "nav.home": "Accueil",

@@ -32,6 +32,7 @@ export const en = {
   "brand.home": "ServaLink home",
   "brand.tagline": "Local Services, Closer to You",
   "lang.label": "Language",
+  "lang.saveFailed": "Language changed on this device, but we couldn't save it to your account.",
 
   // --- navigation / shell ---
   "nav.home": "Home",
