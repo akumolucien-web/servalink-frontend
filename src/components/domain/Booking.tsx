@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar, Check, MapPin, Tag } from "lucide-react";
 import { api, ApiError, type Booking, type BookingAction } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
+import { useLang, useT, type Key } from "../../i18n/I18nProvider";
 import { formatBookingDate, formatDateTime } from "../../lib/format";
 import { BOOKING_STATUS } from "../../lib/status";
 import { buildTimeline } from "../../lib/timeline";
@@ -20,33 +21,33 @@ export function useBookingRole(booking: Pick<Booking, "provider_id">): BookingRo
 }
 
 interface ActionDef {
-  label: string;
-  done: string;
+  label: Key;
+  done: Key;
   variant: "primary" | "secondary" | "danger-outline";
-  confirm?: { title: string; message: string; confirmLabel: string; tone?: "danger" };
+  confirm?: { title: Key; message: Key; confirmLabel: Key; tone?: "danger" };
 }
 
 // Backend action names stay exact; button copy follows the product rules ("Mark Finished" sends MARK_COMPLETED).
 export const BOOKING_ACTIONS: Record<BookingAction, ActionDef> = {
-  ACCEPT: { label: "Accept", done: "Booking accepted", variant: "primary" },
+  ACCEPT: { label: "bk.accept", done: "bk.accept.done", variant: "primary" },
   REJECT: {
-    label: "Reject", done: "Booking rejected", variant: "danger-outline",
-    confirm: { title: "Reject this request?", message: "The customer will be told you can't take this job. You can't undo this.", confirmLabel: "Reject request", tone: "danger" },
+    label: "bk.reject", done: "bk.reject.done", variant: "danger-outline",
+    confirm: { title: "bk.reject.title", message: "bk.reject.message", confirmLabel: "bk.reject.confirm", tone: "danger" },
   },
-  START_WORK: { label: "Start work", done: "Work started", variant: "primary" },
+  START_WORK: { label: "bk.start", done: "bk.start.done", variant: "primary" },
   MARK_COMPLETED: {
-    label: "Mark Finished", done: "Marked as finished", variant: "primary",
-    confirm: { title: "Mark this job as finished?", message: "The customer will be asked to confirm that the work is complete.", confirmLabel: "Mark Finished" },
+    label: "bk.finish", done: "bk.finish.done", variant: "primary",
+    confirm: { title: "bk.finish.title", message: "bk.finish.message", confirmLabel: "bk.finish" },
   },
   CONFIRM_COMPLETION: {
-    label: "Confirm completion", done: "Completion confirmed", variant: "primary",
-    confirm: { title: "Confirm the work is complete?", message: "This closes the booking and lets you leave a review.", confirmLabel: "Confirm completion" },
+    label: "bk.confirm", done: "bk.confirm.done", variant: "primary",
+    confirm: { title: "bk.confirm.title", message: "bk.confirm.message", confirmLabel: "bk.confirm" },
   },
   CANCEL: {
-    label: "Cancel request", done: "Request cancelled", variant: "danger-outline",
-    confirm: { title: "Cancel this request?", message: "The provider will be told you no longer need this service.", confirmLabel: "Cancel request", tone: "danger" },
+    label: "bk.cancel", done: "bk.cancel.done", variant: "danger-outline",
+    confirm: { title: "bk.cancel.title", message: "bk.cancel.message", confirmLabel: "bk.cancel", tone: "danger" },
   },
-  PROVIDER_CANCEL: { label: "Cancel job", done: "Job cancelled", variant: "danger-outline" },
+  PROVIDER_CANCEL: { label: "bk.providerCancel", done: "bk.providerCancel.done", variant: "danger-outline" },
 };
 
 /** The backend demands a reason (5-300 chars) for PROVIDER_CANCEL and for CANCEL once the booking is past PENDING. */
@@ -69,6 +70,7 @@ export function availableActions(booking: Pick<Booking, "status">, role: Booking
 export function BookingActionButtons({ booking, role, onChanged, size = "md" }: {
   booking: Booking; role: BookingRole; onChanged: () => void | Promise<void>; size?: "sm" | "md";
 }) {
+  const t = useT();
   const confirm = useConfirm();
   const toast = useToast();
   const [busy, setBusy] = useState<BookingAction | null>(null);
@@ -79,10 +81,10 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
     setBusy(action);
     try {
       await api.bookingAction(booking.booking_id, action, reason);
-      toast.success(BOOKING_ACTIONS[action].done);
+      toast.success(t(BOOKING_ACTIONS[action].done));
       setAsking(null);
     } catch (error) {
-      toast.error(error instanceof ApiError ? error.message : "That didn't work. Try again.");
+      toast.error(error instanceof ApiError ? error.message : t("common.errGeneric"));
     } finally {
       setBusy(null);
       await onChanged();
@@ -92,12 +94,14 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
   const run = async (action: BookingAction) => {
     if (needsReason(booking, action)) { setAsking(action); return; }
     const def = BOOKING_ACTIONS[action];
-    if (def.confirm && !(await confirm(def.confirm))) return;
+    if (def.confirm && !(await confirm({
+      title: t(def.confirm.title), message: t(def.confirm.message), confirmLabel: t(def.confirm.confirmLabel), tone: def.confirm.tone,
+    }))) return;
     await send(action);
   };
 
   const submitReason = async (note: string) => {
-    if (note.length < 5 || note.length > 300) throw new Error("Give a reason of 5 to 300 characters");
+    if (note.length < 5 || note.length > 300) throw new Error(t("bk.reasonLength"));
     await send(asking!, note); // the modal closes only once the API accepted it, so a rejected reason isn't lost
   };
 
@@ -107,35 +111,36 @@ export function BookingActionButtons({ booking, role, onChanged, size = "md" }: 
       {actions.map((action) => (
         <Button key={action} size={size} variant={BOOKING_ACTIONS[action].variant} loading={busy === action}
           disabled={busy !== null} onClick={() => run(action)}>
-          {action === "CANCEL" && booking.status !== "PENDING" ? "Cancel booking" : BOOKING_ACTIONS[action].label}
+          {action === "CANCEL" && booking.status !== "PENDING" ? t("bk.cancelBooking") : t(BOOKING_ACTIONS[action].label)}
         </Button>
       ))}
-      <NoteModal open={asking !== null} tone="danger" title={asking === "PROVIDER_CANCEL" ? "Cancel this job?" : "Cancel this booking?"}
-        intro={<p className="muted small">{asking === "PROVIDER_CANCEL" ? "The customer will see your reason." : "The provider will see your reason."}</p>}
-        label="Reason (at least 5 characters)" confirmLabel={asking === "PROVIDER_CANCEL" ? "Cancel job" : "Cancel booking"}
+      <NoteModal open={asking !== null} tone="danger" title={t(asking === "PROVIDER_CANCEL" ? "bk.cancelJobTitle" : "bk.cancelBookingTitle")}
+        intro={<p className="muted small">{t(asking === "PROVIDER_CANCEL" ? "bk.reasonSeenByCustomer" : "bk.reasonSeenByProvider")}</p>}
+        label={t("bk.reasonLabel")} confirmLabel={t(asking === "PROVIDER_CANCEL" ? "bk.providerCancel" : "bk.cancelBooking")}
         onClose={() => setAsking(null)} onSubmit={submitReason} />
     </>
   );
 }
 
 export function BookingCard({ booking, onChanged }: { booking: Booking; onChanged: () => void | Promise<void> }) {
+  const t = useT();
   const role = useBookingRole(booking);
   const status = BOOKING_STATUS[booking.status];
   const counterparty = role === "citizen" ? booking.provider_name : booking.citizen_name;
   return (
-    <article className="card card-interactive booking-card" aria-label={`Booking ${booking.reference}`}>
+    <article className="card card-interactive booking-card" aria-label={t("bk.aria", { ref: booking.reference })}>
       <div className="top">
         <div className="row" style={{ gap: 12, flexWrap: "nowrap" }}>
           <Avatar name={counterparty} size={44} />
           <div>
             <div className="row" style={{ gap: 10 }}>
               <Link className="ref" to={`/app/bookings/${booking.booking_id}`} style={{ color: "inherit" }}>{booking.reference}</Link>
-              <StatusBadge label={status.label} tone={status.tone} />
+              <StatusBadge label={t(status.label)} tone={status.tone} />
             </div>
-            <div className="muted small">{role === "citizen" ? "Provider" : "Customer"}: {counterparty || "Unknown"}</div>
+            <div className="muted small">{t(role === "citizen" ? "bk.providerLine" : "bk.customerLine", { name: counterparty || t("bk.unknown") })}</div>
           </div>
         </div>
-        <div className="muted xs">Requested {formatDateTime(booking.created_at)}</div>
+        <div className="muted xs">{t("bk.requested", { date: formatDateTime(booking.created_at) })}</div>
       </div>
       <div className="meta">
         {booking.category_name && <span><Tag size={15} aria-hidden="true" />{booking.category_name}</span>}
@@ -146,18 +151,20 @@ export function BookingCard({ booking, onChanged }: { booking: Booking; onChange
       <div className="actions">
         <BookingActionButtons booking={booking} role={role} onChanged={onChanged} size="sm" />
         {role === "citizen" && booking.status === "COMPLETED" && !booking.reviewed && (
-          <ButtonLink size="sm" variant="secondary" to={`/app/bookings/${booking.booking_id}/review`}>Leave a review</ButtonLink>
+          <ButtonLink size="sm" variant="secondary" to={`/app/bookings/${booking.booking_id}/review`}>{t("bk.leaveReview")}</ButtonLink>
         )}
-        <ButtonLink size="sm" variant="ghost" to={`/app/bookings/${booking.booking_id}`}>View details</ButtonLink>
+        <ButtonLink size="sm" variant="ghost" to={`/app/bookings/${booking.booking_id}`}>{t("bk.viewDetails")}</ButtonLink>
       </div>
     </article>
   );
 }
 
 export function BookingTimeline({ booking, role }: { booking: Booking; role: BookingRole }) {
-  const steps = buildTimeline(booking, role);
+  const t = useT();
+  const { lang } = useLang();
+  const steps = buildTimeline(booking, role, lang);
   return (
-    <ol className="timeline" aria-label="Booking progress" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+    <ol className="timeline" aria-label={t("bk.progress")} style={{ listStyle: "none", margin: 0, padding: 0 }}>
       {steps.map((step) => (
         <li key={step.key} className={`tl-step ${step.state}`} aria-current={step.state === "current" ? "step" : undefined}>
           <span className="tl-dot" aria-hidden="true">{(step.state === "done" || step.state === "bad") && <Check size={14} strokeWidth={3} />}</span>

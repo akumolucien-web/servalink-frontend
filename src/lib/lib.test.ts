@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { formatBookingDate, formatFcfa, initials, nextHourLocal } from "./format";
-import { RATING_LABEL, ratingRank } from "./status";
+import { afterEach, describe, expect, it } from "vitest";
+import { categoryLabel, formatBookingDate, formatFcfa, greeting, initials, nextHourLocal } from "./format";
+import { applyLang } from "../i18n/core";
+import { BOOKING_STATUS, RATING_LABEL, ratingRank, reportReasonLabel } from "./status";
+import { translate } from "../i18n/core";
 import { buildTimeline } from "./timeline";
 
 const base = { created_at: "2026-10-01T09:00:00+00:00", updated_at: "2026-10-02T10:00:00+00:00" };
@@ -61,5 +63,48 @@ describe("formatFcfa", () => {
   it("says price on request when there is no price", () => {
     expect(formatFcfa(null)).toBe("Price on request");
     expect(formatFcfa(undefined)).toBe("Price on request");
+  });
+});
+
+describe("French", () => {
+  afterEach(() => applyLang("en"));
+
+  it("formatFcfa says Sur devis when there is no price", () => {
+    applyLang("fr");
+    expect(formatFcfa(null)).toBe("Sur devis");
+    expect(formatFcfa(5000)).toBe("5 000 FCFA");
+  });
+
+  it("explains a cancelled booking in French", () => {
+    const cancelled = { ...base, status: "CANCELLED" as const, cancelled_by: "PROVIDER" as const, cancel_reason: "Panne de camion" };
+    const steps = buildTimeline(cancelled, "citizen", "fr");
+    expect(steps.map((s) => s.title)).toEqual(["Demande envoyée", "Annulée"]);
+    expect(steps[1].description).toBe("Le prestataire a annulé : Panne de camion");
+    expect(buildTimeline({ ...cancelled, cancel_reason: undefined }, "provider", "fr")[1].description).toBe("Vous avez annulé : aucune raison indiquée");
+    expect(buildTimeline(cancelled, "citizen", "en")[1].description).toBe("The provider cancelled: Panne de camion");
+  });
+
+  it("booking statuses and greetings follow the language", () => {
+    const label = (lang: "fr" | "en") => (["PENDING", "ACCEPTED", "IN_PROGRESS", "AWAITING_CONFIRMATION", "COMPLETED", "REJECTED", "CANCELLED"] as const)
+      .map((s) => translate(lang, BOOKING_STATUS[s].label));
+    expect(label("fr")).toEqual(["En attente", "Acceptée", "En cours", "En attente de confirmation", "Terminée", "Refusée", "Annulée"]);
+    expect(label("en")[3]).toBe("Awaiting confirmation");
+    expect(greeting(new Date(2026, 0, 1, 9), "fr")).toBe("Bonjour");
+    expect(greeting(new Date(2026, 0, 1, 20), "fr")).toBe("Bonsoir");
+    expect(greeting(new Date(2026, 0, 1, 9), "en")).toBe("Good morning");
+  });
+
+  it("report reasons are stored in English and shown in the active language", () => {
+    expect(reportReasonLabel("Safety concern", "fr")).toBe("Problème de sécurité");
+    expect(reportReasonLabel("Safety concern", "en")).toBe("Safety concern");
+    expect(reportReasonLabel("Free text from an older report", "fr")).toBe("Free text from an older report");
+  });
+
+  it("categoryLabel uses the French name only in French and only when present", () => {
+    const c = { category_name: "Plumbing", category_name_fr: "Plomberie" };
+    expect(categoryLabel(c, "fr")).toBe("Plomberie");
+    expect(categoryLabel(c, "en")).toBe("Plumbing");
+    expect(categoryLabel({ category_name: "Plumbing" }, "fr")).toBe("Plumbing");
+    expect(categoryLabel({ category_name: "Plumbing", category_name_fr: " " }, "fr")).toBe("Plumbing");
   });
 });

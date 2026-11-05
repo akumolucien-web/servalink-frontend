@@ -1,20 +1,25 @@
 import type { ProviderStatus } from "../api/types";
+import type { Key } from "../i18n/core";
 
 export type Decision = Exclude<ProviderStatus, "PENDING">;
-export interface DecisionDef { status: Decision; label: string; variant: "primary" | "danger-outline" | "secondary"; tone?: "danger"; noteLabel: string; seed?: string; done: string }
+/** Labels are dictionary keys; the page translates them. `seed` is the note pre-filled in the dialog. */
+export interface DecisionDef {
+  status: Decision; label: Key; variant: "primary" | "danger-outline" | "secondary"; tone?: "danger";
+  noteLabel: Key; seed?: Key; done: Key; title: Key;
+}
 
-const SUSPEND: DecisionDef = { status: "SUSPENDED", label: "Suspend", variant: "danger-outline", tone: "danger", noteLabel: "Reason for suspending", done: "Provider suspended" };
-const BAN: DecisionDef = { status: "BANNED", label: "Ban", variant: "danger-outline", tone: "danger", noteLabel: "Reason for banning", done: "Provider banned" };
+const SUSPEND: DecisionDef = { status: "SUSPENDED", label: "dec.suspend", variant: "danger-outline", tone: "danger", noteLabel: "dec.suspend.note", done: "dec.suspend.done", title: "dec.suspend.title" };
+const BAN: DecisionDef = { status: "BANNED", label: "dec.ban", variant: "danger-outline", tone: "danger", noteLabel: "dec.ban.note", done: "dec.ban.done", title: "dec.ban.title" };
 
 /** Admin decisions available for each provider status (shared by the Providers and Reports pages). */
 export const DECISIONS: Record<ProviderStatus, DecisionDef[]> = {
   PENDING: [
-    { status: "APPROVED", label: "Approve", variant: "primary", noteLabel: "Note for the provider", seed: "Verified and approved.", done: "Provider approved" },
-    { status: "REJECTED", label: "Reject", variant: "danger-outline", tone: "danger", noteLabel: "Reason for rejecting", done: "Application rejected" },
+    { status: "APPROVED", label: "dec.approve", variant: "primary", noteLabel: "dec.approve.note", seed: "dec.approve.seed", done: "dec.approve.done", title: "dec.approve.title" },
+    { status: "REJECTED", label: "dec.reject", variant: "danger-outline", tone: "danger", noteLabel: "dec.reject.note", done: "dec.reject.done", title: "dec.reject.title" },
   ],
   APPROVED: [SUSPEND, BAN],
   SUSPENDED: [
-    { status: "APPROVED", label: "Reinstate", variant: "primary", noteLabel: "Note for the provider", seed: "Suspension lifted.", done: "Provider reinstated" },
+    { status: "APPROVED", label: "dec.reinstate", variant: "primary", noteLabel: "dec.approve.note", seed: "dec.reinstate.seed", done: "dec.reinstate.done", title: "dec.reinstate.title" },
     BAN,
   ],
   REJECTED: [], BANNED: [],

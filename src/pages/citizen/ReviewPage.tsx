@@ -8,13 +8,16 @@ import { Button, ButtonLink } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { TextAreaField } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
-import { RATING_LABEL, RATING_ORDER } from "../../lib/status";
+import { useLang, useT } from "../../i18n/I18nProvider";
+import { ratingLabel, RATING_ORDER } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function ReviewPage() {
   const { id = "" } = useParams();
   const { session } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const booking = useResource(() => api.booking(id), [id]);
   const [rating, setRating] = useState<Rating | "">("");
@@ -32,9 +35,9 @@ export function ReviewPage() {
     const reviewed = b.reviewed;
     return (
       <div className="card"><EmptyState icon={reviewed ? <CheckCircle2 size={24} /> : <CalendarX2 size={24} />}
-        title={reviewed ? "You've already reviewed this booking" : "You can't review this booking yet"}
-        action={<ButtonLink to={back} variant="secondary">Back to booking</ButtonLink>}>
-        {reviewed ? "Each booking can be reviewed once." : "You can leave a review after you confirm the work is complete."}
+        title={t(reviewed ? "rv.already" : "rv.cant")}
+        action={<ButtonLink to={back} variant="secondary">{t("rp.backToBooking")}</ButtonLink>}>
+        {t(reviewed ? "rv.onceText" : "rv.afterConfirm")}
       </EmptyState></div>
     );
   }
@@ -42,46 +45,46 @@ export function ReviewPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
-    if (!rating) next.rating = "Choose a rating";
-    if (!comment.trim()) next.comment = "Tell others how the job went";
+    if (!rating) next.rating = t("rv.errRating");
+    if (!comment.trim()) next.comment = t("rv.errComment");
     setErrors(next);
     if (next.rating || next.comment) return;
     setBusy(true);
     try {
       const photo_key = photo ? await uploadImage(photo, "REVIEW") : undefined;
       await api.createReview({ booking_id: b.booking_id, rating: rating as Rating, comment: comment.trim(), photo_key });
-      toast.success("Review submitted");
+      toast.success(t("rv.submitted"));
       navigate(back, { replace: true });
     } catch (error) {
-      setErrors({ form: error instanceof ApiError ? error.message : "We couldn't submit your review. Try again." });
+      setErrors({ form: error instanceof ApiError ? error.message : t("rv.failed") });
       setBusy(false);
     }
   };
 
   return (
     <>
-      <BackLink to={back}>Back to booking</BackLink>
-      <PageHeader title={`Review ${b.provider_name}`} subtitle={`Booking ${b.reference}. Your review will be marked as a verified booking.`} />
-      <form className="card card-pad stack" style={{ maxWidth: 680 }} onSubmit={submit} noValidate aria-label="Review">
+      <BackLink to={back}>{t("rp.backToBooking")}</BackLink>
+      <PageHeader title={t("rv.title", { name: b.provider_name })} subtitle={t("rv.sub", { ref: b.reference })} />
+      <form className="card card-pad stack" style={{ maxWidth: 680 }} onSubmit={submit} noValidate aria-label={t("rv.formAria")}>
         {errors.form && <Banner tone="danger">{errors.form}</Banner>}
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-          <legend className="field-label" style={{ marginBottom: 8 }}>How was the work?</legend>
-          <div className="rating-picker" role="radiogroup" aria-label="Rating">
+          <legend className="field-label" style={{ marginBottom: 8 }}>{t("rv.how")}</legend>
+          <div className="rating-picker" role="radiogroup" aria-label={t("rv.ratingAria")}>
             {RATING_ORDER.map((value) => (
               <label className="rating-option" key={value}>
                 <input type="radio" name="rating" value={value} checked={rating === value} onChange={() => { setRating(value); setErrors((e) => ({ ...e, rating: undefined })); }} />
-                <span>{RATING_LABEL[value]}</span>
+                <span>{ratingLabel(value, lang)}</span>
               </label>
             ))}
           </div>
           {errors.rating && <p className="field-error" role="alert" style={{ marginTop: 6 }}>{errors.rating}</p>}
         </fieldset>
-        <TextAreaField label="Your review" value={comment} error={errors.comment} maxLength={1500}
-          placeholder="Was the provider on time? Was the work done well?" onChange={(e) => { setComment(e.target.value); setErrors((er) => ({ ...er, comment: undefined })); }} />
-        <ImagePicker label="Add a photo" file={photo} onChange={setPhoto} hint="A photo of the finished work helps others. JPEG, PNG or WEBP, up to 10 MB." />
+        <TextAreaField label={t("rv.yourReview")} value={comment} error={errors.comment} maxLength={1500}
+          placeholder={t("rv.placeholder")} onChange={(e) => { setComment(e.target.value); setErrors((er) => ({ ...er, comment: undefined })); }} />
+        <ImagePicker label={t("rv.addPhoto")} file={photo} onChange={setPhoto} hint={t("rv.photoHint")} />
         <div className="row" style={{ justifyContent: "flex-end" }}>
-          <ButtonLink variant="ghost" to={back}>Cancel</ButtonLink>
-          <Button type="submit" loading={busy}>Submit review</Button>
+          <ButtonLink variant="ghost" to={back}>{t("common.cancel")}</ButtonLink>
+          <Button type="submit" loading={busy}>{t("rv.submit")}</Button>
         </div>
       </form>
     </>

@@ -6,13 +6,16 @@ import { Button } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader, StatusBadge } from "../../components/ui/Display";
 import { SelectField } from "../../components/ui/Field";
 import { Modal } from "../../components/ui/Overlay";
+import { useLang, useT } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { focusDomId, useFocusTarget } from "../../lib/useFocusTarget";
-import { REPORT_STATUS } from "../../lib/status";
+import { REPORT_STATUS, reportReasonLabel } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function ReportsPage() {
   const navigate = useNavigate();
+  const t = useT();
+  const { lang } = useLang();
   const reports = useResource(() => api.myReports(), []);
   const bookings = useResource(() => api.bookings("citizen"), []);
   const [picking, setPicking] = useState(false);
@@ -28,21 +31,21 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageHeader title="My reports" subtitle="Problems you've reported to ServaLink administrators."
-        actions={<Button variant="secondary" onClick={() => setPicking(true)} disabled={reportable.length === 0}>Report a problem</Button>} />
+      <PageHeader title={t("rps.title")} subtitle={t("rps.sub")}
+        actions={<Button variant="secondary" onClick={() => setPicking(true)} disabled={reportable.length === 0}>{t("rp.title")}</Button>} />
       {missing && (
         <div style={{ marginBottom: 16 }}>
-          <Banner tone="warning" action={<Link className="small nowrap" to="/app/reports">View my reports</Link>}>
-            <strong>We couldn't find that report.</strong>
-            <span>It may not exist, or it isn't one of your reports.</span>
+          <Banner tone="warning" action={<Link className="small nowrap" to="/app/reports">{t("rp.viewMine")}</Link>}>
+            <strong>{t("rps.missing")}</strong>
+            <span>{t("rps.missingText")}</span>
           </Banner>
         </div>
       )}
       {reports.loading && !reports.data ? <CardSkeleton rows={2} />
-        : reports.error ? <ErrorState error={reports.error} onRetry={reports.reload} title="We couldn't load your reports" />
+        : reports.error ? <ErrorState error={reports.error} onRetry={reports.reload} title={t("rps.error")} />
           : reports.data!.length === 0 ? (
-            <div className="card"><EmptyState icon={<Flag size={24} />} title="No reports">
-              If a job goes wrong, open the booking and choose "Report a problem". Reports you submit will show up here with their status.
+            <div className="card"><EmptyState icon={<Flag size={24} />} title={t("rps.none")}>
+              {t("rps.noneText")}
             </EmptyState></div>
           ) : (
             <div className="stack">
@@ -53,28 +56,28 @@ export function ReportsPage() {
                   <article id={focusDomId(report.report_id)} className={`card card-pad stack-sm${report.report_id === id ? " focus-target" : ""}`} key={report.report_id}>
                     <div className="row-between">
                       <div>
-                        <strong>{report.reason}</strong>
+                        <strong>{reportReasonLabel(report.reason, lang)}</strong>
                         <div className="muted xs">{booking ? <><Link to={`/app/bookings/${booking.booking_id}`}>{booking.reference}</Link> · </> : ""}{formatDateTime(report.created_at)}</div>
                       </div>
-                      <StatusBadge label={status.label} tone={status.tone} />
+                      <StatusBadge label={t(status.label)} tone={status.tone} />
                     </div>
                     <p className="small">{report.description}</p>
-                    {report.evidence_url && <a href={report.evidence_url} target="_blank" rel="noreferrer" className="small">View evidence photo</a>}
-                    {report.admin_note && <p className="hint-box"><strong>Administrator note:</strong> {report.admin_note}</p>}
+                    {report.evidence_url && <a href={report.evidence_url} target="_blank" rel="noreferrer" className="small">{t("rps.viewEvidence")}</a>}
+                    {report.admin_note && <p className="hint-box"><strong>{t("rps.adminNote")}</strong> {report.admin_note}</p>}
                   </article>
                 );
               })}
             </div>
           )}
 
-      <Modal open={picking} title="Report a problem" onClose={() => setPicking(false)}
+      <Modal open={picking} title={t("rp.title")} onClose={() => setPicking(false)}
         footer={<>
-          <Button variant="ghost" onClick={() => setPicking(false)}>Cancel</Button>
-          <Button disabled={!bookingId} onClick={() => navigate(`/app/bookings/${bookingId}/report`)}>Continue</Button>
+          <Button variant="ghost" onClick={() => setPicking(false)}>{t("common.cancel")}</Button>
+          <Button disabled={!bookingId} onClick={() => navigate(`/app/bookings/${bookingId}/report`)}>{t("rps.continue")}</Button>
         </>}>
         <div className="modal-body form">
-          <SelectField label="Which booking is this about?" value={bookingId} onChange={(e) => setBookingId(e.target.value)}>
-            <option value="">Choose a booking</option>
+          <SelectField label={t("rps.which")} value={bookingId} onChange={(e) => setBookingId(e.target.value)}>
+            <option value="">{t("rps.chooseBooking")}</option>
             {reportable.map((b) => <option key={b.booking_id} value={b.booking_id}>{b.reference} · {b.provider_name}</option>)}
           </SelectField>
         </div>

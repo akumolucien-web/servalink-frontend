@@ -1,4 +1,5 @@
 import { getLang, translate, type Lang } from "../i18n/core";
+import type { Category } from "../api/types";
 
 const MONTHS: Record<Lang, string[]> = {
   en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -50,16 +51,24 @@ export function firstName(name?: string): string {
   return (name ?? "").trim().split(/\s+/)[0] ?? "";
 }
 
-export function greeting(now = new Date()): string {
+export function greeting(now = new Date(), lang: Lang = getLang()): string {
   const hour = now.getHours();
-  return hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  return translate(lang, hour < 12 ? "greet.morning" : hour < 18 ? "greet.afternoon" : "greet.evening");
 }
 
-export function plural(count: number, one: string, many = one + "s"): string {
-  return `${count} ${count === 1 ? one : many}`;
+/** "Good morning, Awa!" / "Bonjour, Awa !"; just the greeting when there is no first name. */
+export function greetingTitle(fullName?: string, lang: Lang = getLang(), now = new Date()): string {
+  const text = greeting(now, lang);
+  const name = firstName(fullName);
+  return name ? translate(lang, "greet.hello", { greeting: text, name }) : translate(lang, "greet.helloAnon", { greeting: text });
 }
 
-/** "5 000 FCFA"; a regular space separator (toLocaleString varies by browser). No price means "Price on request". */
+/** Category name to show: the French name when the language is French and the record has one. Search still sends category_name. */
+export function categoryLabel(category: Pick<Category, "category_name" | "category_name_fr">, lang: Lang = getLang()): string {
+  return (lang === "fr" && category.category_name_fr?.trim()) || category.category_name;
+}
+
+/** "5 000 FCFA"; a regular space separator (toLocaleString varies by browser). No price means "Price on request" / "Sur devis". */
 export function formatFcfa(n?: number | null): string {
   if (n == null) return translate(getLang(), "common.priceOnRequest");
   return `${String(Math.round(n)).replace(/\B(?=(\d{3})+$)/g, " ")} FCFA`;

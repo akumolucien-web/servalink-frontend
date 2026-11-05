@@ -4,6 +4,7 @@ import { api, type Booking } from "../../api";
 import { BookingCard } from "../../components/domain/Booking";
 import { CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { Tabs } from "../../components/ui/Tabs";
+import { useT, type Key } from "../../i18n/I18nProvider";
 import { CLOSED_BOOKING } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
@@ -15,34 +16,35 @@ const FILTERS: Record<Tab, (b: Booking) => boolean> = {
   completed: (b) => b.status === "COMPLETED",
   closed: (b) => CLOSED_BOOKING.includes(b.status),
 };
-const EMPTY: Record<Tab, string> = {
-  requests: "New booking requests from customers will appear here.",
-  active: "Jobs you've accepted or started will appear here.",
-  awaiting: "Jobs you marked finished are waiting here for the customer to confirm.",
-  completed: "Jobs the customer confirmed will appear here.",
-  closed: "Requests you rejected, or that customers cancelled, appear here.",
+const EMPTY: Record<Tab, Key> = {
+  requests: "pb.empty.requests",
+  active: "pb.empty.active",
+  awaiting: "pb.empty.awaiting",
+  completed: "pb.empty.completed",
+  closed: "pb.empty.closed",
 };
 
 /** Provider view of bookings: requests customers sent to my provider profile. */
 export function ProviderBookingsPage() {
+  const t = useT();
   const [tab, setTab] = useState<Tab>("requests");
   const bookings = useResource(() => api.bookings("provider"), []);
   const all = bookings.data ?? [];
-  const count = (t: Tab) => (bookings.data ? all.filter(FILTERS[t]).length : undefined);
+  const count = (which: Tab) => (bookings.data ? all.filter(FILTERS[which]).length : undefined);
   const shown = all.filter(FILTERS[tab]);
 
   return (
     <>
-      <PageHeader title="Booking requests" subtitle="Requests customers sent to your provider profile." />
+      <PageHeader title={t("pb.title")} subtitle={t("pb.sub")} />
       <div className="stack">
-        <Tabs label="Filter booking requests" value={tab} onChange={setTab} tabs={[
-          { id: "requests", label: "New requests", count: count("requests") }, { id: "active", label: "Active", count: count("active") },
-          { id: "awaiting", label: "Awaiting confirmation", count: count("awaiting") }, { id: "completed", label: "Completed", count: count("completed") },
-          { id: "closed", label: "Closed", count: count("closed") },
+        <Tabs label={t("pb.filter")} value={tab} onChange={setTab} tabs={[
+          { id: "requests", label: t("pb.new"), count: count("requests") }, { id: "active", label: t("bks.active"), count: count("active") },
+          { id: "awaiting", label: t("status.booking.AWAITING_CONFIRMATION"), count: count("awaiting") }, { id: "completed", label: t("bks.completed"), count: count("completed") },
+          { id: "closed", label: t("pb.closed"), count: count("closed") },
         ]} />
         {bookings.loading && !bookings.data ? <CardSkeleton rows={3} />
-          : bookings.error ? <ErrorState error={bookings.error} onRetry={bookings.reload} title="We couldn't load booking requests" />
-            : shown.length === 0 ? <div className="card"><EmptyState icon={<Inbox size={24} />} title="Nothing here">{EMPTY[tab]}</EmptyState></div>
+          : bookings.error ? <ErrorState error={bookings.error} onRetry={bookings.reload} title={t("pb.error")} />
+            : shown.length === 0 ? <div className="card"><EmptyState icon={<Inbox size={24} />} title={t("pb.nothing")}>{t(EMPTY[tab])}</EmptyState></div>
               : <div className="stack">{shown.map((b) => <BookingCard key={b.booking_id} booking={b} onChanged={bookings.reload} />)}</div>}
       </div>
     </>

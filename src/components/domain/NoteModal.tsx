@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { Button } from "../ui/Button";
 import { Banner } from "../ui/Display";
 import { TextAreaField } from "../ui/Field";
@@ -9,6 +10,7 @@ export function NoteModal({ open, title, intro, label, confirmLabel, tone = "pri
   open: boolean; title: string; intro?: ReactNode; label: string; confirmLabel: string; tone?: "primary" | "danger";
   initialNote?: string; onClose: () => void; onSubmit: (note: string) => Promise<void>;
 }) {
+  const t = useT();
   const [note, setNote] = useState(initialNote);
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -18,10 +20,10 @@ export function NoteModal({ open, title, intro, label, confirmLabel, tone = "pri
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!note.trim()) { setError("Add a note before continuing"); return; }
+    if (!note.trim()) { setError(t("note.required")); return; }
     setBusy(true); setError(undefined);
     try { await onSubmit(note.trim()); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : "That didn't work. Try again."); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : t("common.errGeneric")); }
     finally { setBusy(false); }
   };
 
@@ -34,7 +36,7 @@ export function NoteModal({ open, title, intro, label, confirmLabel, tone = "pri
           <TextAreaField label={label} value={note} error={error && !note.trim() ? error : undefined} maxLength={1000} onChange={(e) => setNote(e.target.value)} />
         </div>
         <div className="modal-foot">
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button>
           <Button type="submit" variant={tone === "danger" ? "danger" : "primary"} loading={busy}>{confirmLabel}</Button>
         </div>
       </form>

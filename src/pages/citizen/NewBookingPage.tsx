@@ -8,6 +8,7 @@ import { Button, ButtonLink } from "../../components/ui/Button";
 import { Avatar, Banner, CardSkeleton, EmptyState, ErrorState, PageHeader, RatingChip } from "../../components/ui/Display";
 import { SelectField, TextAreaField, TextField } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
+import { useT } from "../../i18n/I18nProvider";
 import { nextHourLocal } from "../../lib/format";
 import { fold, quartiersOf } from "../../lib/locations";
 import { useResource } from "../../lib/useResource";
@@ -18,6 +19,7 @@ export function NewBookingPage() {
   const { serviceId = "" } = useParams();
   const { session, profile } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
   const toast = useToast();
   const service = useResource(() => api.service(serviceId), [serviceId]);
   const [date, setDate] = useState("");
@@ -33,9 +35,9 @@ export function NewBookingPage() {
   if (service.error) {
     const missing = service.error instanceof ApiError && service.error.status === 404;
     return missing ? (
-      <div className="card"><EmptyState icon={<UserX size={24} />} title="This service isn't available"
-        action={<ButtonLink to="/search" variant="secondary">Find another service</ButtonLink>}>
-        It may have been removed, or the provider is no longer active.
+      <div className="card"><EmptyState icon={<UserX size={24} />} title={t("nb.unavailable")}
+        action={<ButtonLink to="/search" variant="secondary">{t("nb.findAnother")}</ButtonLink>}>
+        {t("nb.removed")}
       </EmptyState></div>
     ) : <ErrorState error={service.error} onRetry={service.reload} />;
   }
@@ -51,61 +53,61 @@ export function NewBookingPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
-    if (!date) next.date = "Choose a date and time";
-    else if (date < min) next.date = "Choose a time from the next hour onward";
-    if (message.trim().length < 10) next.message = "Describe the job in a few words (at least 10 characters)";
-    if (!quartier.trim()) next.quartier = "Select or type your quartier";
-    if (address.trim().length < 5) next.address = "Describe where to come (at least 5 characters)";
+    if (!date) next.date = t("nb.errDate");
+    else if (date < min) next.date = t("nb.errDatePast");
+    if (message.trim().length < 10) next.message = t("nb.errMessage");
+    if (!quartier.trim()) next.quartier = t("nb.errQuartier");
+    if (address.trim().length < 5) next.address = t("nb.errAddress");
     setErrors(next);
     if (next.date || next.message || next.quartier || next.address) return;
     setBusy(true);
     try {
       const booking = await api.createBooking({ service_id: s.service_id, booking_date: date, message: message.trim(), quartier: quartier.trim(), address_details: address.trim() });
-      toast.success("Booking request sent");
+      toast.success(t("nb.sent"));
       navigate(`/app/bookings/${booking.booking_id}`, { replace: true });
     } catch (error) {
-      setErrors({ form: error instanceof ApiError ? error.message : "We couldn't send your request. Try again." });
+      setErrors({ form: error instanceof ApiError ? error.message : t("nb.failed") });
       setBusy(false);
     }
   };
 
   return (
     <>
-      <BackLink to={`/providers/${s.provider_id}`}>Back to provider</BackLink>
-      <PageHeader title="Request a booking" subtitle="The provider will accept or decline your request." />
+      <BackLink to={`/providers/${s.provider_id}`}>{t("nb.back")}</BackLink>
+      <PageHeader title={t("nb.title")} subtitle={t("nb.sub")} />
       <div className="two-col">
-        <form className="card card-pad stack" onSubmit={submit} noValidate aria-label="Booking request">
-          {own && <Banner tone="warning">This is your own service. You can't book yourself.</Banner>}
+        <form className="card card-pad stack" onSubmit={submit} noValidate aria-label={t("nb.formAria")}>
+          {own && <Banner tone="warning">{t("nb.own")}</Banner>}
           {errors.form && <Banner tone="danger">{errors.form}</Banner>}
-          <TextField label="Date and time" type="datetime-local" min={min} value={date} error={errors.date}
-            hint="Choose when you'd like the provider to come." onChange={(e) => { setDate(e.target.value); setErrors((er) => ({ ...er, date: undefined })); }} disabled={own} />
-          <TextAreaField label="Describe the job" value={message} error={errors.message} maxLength={1000}
-            placeholder="For example: the kitchen pipe under the sink is leaking."
+          <TextField label={t("nb.date")} type="datetime-local" min={min} value={date} error={errors.date}
+            hint={t("nb.dateHint")} onChange={(e) => { setDate(e.target.value); setErrors((er) => ({ ...er, date: undefined })); }} disabled={own} />
+          <TextAreaField label={t("nb.job")} value={message} error={errors.message} maxLength={1000}
+            placeholder={t("nb.jobPlaceholder")}
             onChange={(e) => { setMessage(e.target.value); setErrors((er) => ({ ...er, message: undefined })); }} disabled={own} />
-          <SelectField label="Quartier" value={other ? OTHER : known ?? ""} error={errors.quartier} disabled={own}
+          <SelectField label={t("loc.quartier")} value={other ? OTHER : known ?? ""} error={errors.quartier} disabled={own}
             onChange={(e) => {
               const v = e.target.value;
               setTyping(v === OTHER); setQuartier(v === OTHER ? "" : v);
               setErrors((er) => ({ ...er, quartier: undefined }));
             }}>
-            <option value="">Select a quartier</option>
+            <option value="">{t("loc.selectQuartier")}</option>
             {quartiers.map((q) => <option key={q} value={q}>{q}</option>)}
-            <option value={OTHER}>Other (type it)</option>
+            <option value={OTHER}>{t("loc.other")}</option>
           </SelectField>
           {other && (
-            <TextField label="Your quartier" value={quartier} maxLength={100} error={errors.quartier} disabled={own}
+            <TextField label={t("loc.yourQuartier")} value={quartier} maxLength={100} error={errors.quartier} disabled={own}
               onChange={(e) => { setTyping(true); setQuartier(e.target.value); setErrors((er) => ({ ...er, quartier: undefined })); }} />
           )}
-          <TextAreaField label="Address and landmark" value={address} error={errors.address} maxLength={300} disabled={own}
-            placeholder="e.g. Behind Total Bonamoussadi, blue gate, 2nd floor"
-            hint="Only the provider you book can see this, once they accept."
+          <TextAreaField label={t("nb.address")} value={address} error={errors.address} maxLength={300} disabled={own}
+            placeholder={t("nb.addressPlaceholder")}
+            hint={t("nb.addressHint")}
             onChange={(e) => { setAddress(e.target.value); setErrors((er) => ({ ...er, address: undefined })); }} />
           <div className="row" style={{ justifyContent: "flex-end" }}>
-            <ButtonLink variant="ghost" to={`/providers/${s.provider_id}`}>Cancel</ButtonLink>
-            <Button type="submit" loading={busy} disabled={own}>Send booking request</Button>
+            <ButtonLink variant="ghost" to={`/providers/${s.provider_id}`}>{t("common.cancel")}</ButtonLink>
+            <Button type="submit" loading={busy} disabled={own}>{t("nb.send")}</Button>
           </div>
         </form>
-        <aside className="card card-pad stack-sm" aria-label="Service summary">
+        <aside className="card card-pad stack-sm" aria-label={t("nb.summary")}>
           <h3 style={{ fontSize: "1rem" }}>{s.name}</h3>
           {s.description && <p className="muted small">{s.description}</p>}
           <p className="muted small row" style={{ gap: 4 }}><MapPin size={14} aria-hidden="true" />{s.city} · {s.category_name}</p>
@@ -114,7 +116,7 @@ export function NewBookingPage() {
             <Avatar name={s.provider_name} src={s.provider_photo_url} size={44} />
             <div><div style={{ fontWeight: 600 }}>{s.provider_name}</div><RatingChip rating={s.overall_rating} /></div>
           </div>
-          <p className="hint-box">ServaLink doesn't handle payment. Agree on the details with your provider.</p>
+          <p className="hint-box">{t("nb.noPayment")}</p>
         </aside>
       </div>
     </>

@@ -1,3 +1,4 @@
+import { getLang, translate, type Key, type Lang, type Vars } from "../i18n/core";
 import type { Booking, BookingStatus } from "../api/types";
 
 export type StepState = "done" | "current" | "upcoming" | "bad";
@@ -14,19 +15,27 @@ const NORMAL: BookingStatus[] = ["PENDING", "ACCEPTED", "IN_PROGRESS", "AWAITING
 
 /**
  * Builds the timeline purely from booking.status. The frontend never advances status.
- * REJECTED / CANCELLED are terminal and show no future steps.
+ * REJECTED / CANCELLED are terminal and show no future steps. Copy follows `lang` (default: the active language).
  */
-function cancelCopy({ cancelled_by: by, cancel_reason: reason }: Pick<Booking, "cancelled_by" | "cancel_reason">, role: "citizen" | "provider") {
-  if (by === "PROVIDER") return role === "citizen" ? `The provider cancelled: ${reason || "no reason given"}` : `You cancelled: ${reason || "no reason given"}`;
-  if (by === "CITIZEN") return role === "citizen" ? "You cancelled this booking." : `The customer cancelled: ${reason || "no reason given"}`;
-  return role === "citizen" ? "You cancelled this request." : "The customer cancelled this request.";
+function cancelCopy({ cancelled_by: by, cancel_reason: reason }: Pick<Booking, "cancelled_by" | "cancel_reason">, role: "citizen" | "provider", lang: Lang) {
+  const t = (key: Key, vars?: Vars) => translate(lang, key, vars);
+  const why = reason || t("tl.noReason");
+  if (by === "PROVIDER") return role === "citizen" ? t("tl.cancel.providerToCitizen", { reason: why }) : t("tl.cancel.providerToProvider", { reason: why });
+  if (by === "CITIZEN") return role === "citizen" ? t("tl.cancel.citizenToCitizen") : t("tl.cancel.citizenToProvider", { reason: why });
+  return role === "citizen" ? t("tl.cancel.legacyCitizen") : t("tl.cancel.legacyProvider");
 }
 
-export function buildTimeline(booking: Pick<Booking, "status" | "created_at" | "updated_at" | "cancelled_by" | "cancel_reason">, role: "citizen" | "provider"): TimelineStep[] {
+export function buildTimeline(
+  booking: Pick<Booking, "status" | "created_at" | "updated_at" | "cancelled_by" | "cancel_reason">,
+  role: "citizen" | "provider",
+  lang: Lang = getLang(),
+): TimelineStep[] {
+  const t = (key: Key) => translate(lang, key);
+  const citizen = role === "citizen";
   const first: TimelineStep = {
     key: "PENDING",
-    title: role === "citizen" ? "Request sent" : "Request received",
-    description: role === "citizen" ? "Your booking request was created." : "A customer asked to book your service.",
+    title: t(citizen ? "tl.sent" : "tl.received"),
+    description: t(citizen ? "tl.sent.text" : "tl.received.text"),
     state: "done",
     time: booking.created_at,
   };
@@ -35,20 +44,18 @@ export function buildTimeline(booking: Pick<Booking, "status" | "created_at" | "
     const rejected = status === "REJECTED";
     return [first, {
       key: status,
-      title: rejected ? "Rejected" : "Cancelled",
-      description: rejected
-        ? (role === "citizen" ? "The provider declined this request." : "You declined this request.")
-        : cancelCopy(booking, role),
+      title: t(rejected ? "status.booking.REJECTED" : "status.booking.CANCELLED"),
+      description: rejected ? t(citizen ? "tl.rejected.citizen" : "tl.rejected.provider") : cancelCopy(booking, role, lang),
       state: "bad",
       time: booking.updated_at,
     }];
   }
   const index = NORMAL.indexOf(status);
   const copy: Record<string, [string, string]> = {
-    ACCEPTED: ["Accepted", role === "citizen" ? "The provider accepted your request." : "You accepted this request."],
-    IN_PROGRESS: ["In progress", role === "citizen" ? "The provider is working on it." : "You started the work."],
-    AWAITING_CONFIRMATION: ["Awaiting confirmation", role === "citizen" ? "The provider says the work is finished. Please confirm." : "Waiting for the customer to confirm."],
-    COMPLETED: ["Completed", role === "citizen" ? "You confirmed the work is complete." : "The customer confirmed completion."],
+    ACCEPTED: [t("status.booking.ACCEPTED"), t(citizen ? "tl.accepted.citizen" : "tl.accepted.provider")],
+    IN_PROGRESS: [t("status.booking.IN_PROGRESS"), t(citizen ? "tl.progress.citizen" : "tl.progress.provider")],
+    AWAITING_CONFIRMATION: [t("status.booking.AWAITING_CONFIRMATION"), t(citizen ? "tl.awaiting.citizen" : "tl.awaiting.provider")],
+    COMPLETED: [t("status.booking.COMPLETED"), t(citizen ? "tl.completed.citizen" : "tl.completed.provider")],
   };
   const steps = NORMAL.slice(1).map((key, i): TimelineStep => {
     const position = i + 1;

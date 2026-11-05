@@ -7,7 +7,8 @@ import { Button, ButtonLink } from "../../components/ui/Button";
 import { CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { LocationPicker } from "../../components/domain/LocationPicker";
 import { SelectField } from "../../components/ui/Field";
-import { useT } from "../../i18n/I18nProvider";
+import { useLang, useT } from "../../i18n/I18nProvider";
+import { categoryLabel } from "../../lib/format";
 import { regionOfCity } from "../../lib/locations";
 import { ratingRank } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
@@ -17,6 +18,7 @@ type Sort = "rating" | "reviews" | "name";
 export function SearchPage() {
   const [params, setParams] = useSearchParams();
   const t = useT();
+  const { lang } = useLang();
   const category = params.get("category") ?? "";
   const city = params.get("city") ?? "";
   const [sort, setSort] = useState<Sort>("rating");
@@ -47,7 +49,10 @@ export function SearchPage() {
     setParams(next);
   };
 
-  const title = category && city ? t("search.titleBoth", { category, city }) : category ? t("search.titleCategory", { category }) : city ? t("search.titleCity", { city }) : t("nav.findService");
+  // The URL carries the English category_name; show its French name when there is one.
+  const known = (categories.data ?? []).find((c) => c.category_name === category);
+  const shownCategory = known ? categoryLabel(known, lang) : category;
+  const title = category && city ? t("search.titleBoth", { category: shownCategory, city }) : category ? t("search.titleCategory", { category: shownCategory }) : city ? t("search.titleCity", { city }) : t("nav.findService");
   return (
     <>
       <PageHeader title={title}
@@ -55,7 +60,7 @@ export function SearchPage() {
       <form className="card filter-bar" onSubmit={submit} aria-label={t("search.filters")}>
         <SelectField label={t("home.category")} value={draftCategory} onChange={(e) => setDraftCategory(e.target.value)}>
           <option value="">{t("search.allCategories")}</option>
-          {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
+          {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_name}>{categoryLabel(c, lang)}</option>)}
         </SelectField>
         <LocationPicker level="city" value={draftLoc} onChange={setDraftLoc} />
         <div style={{ alignSelf: "end" }}><Button type="submit" icon={<Search size={16} />} block>{t("search.button")}</Button></div>

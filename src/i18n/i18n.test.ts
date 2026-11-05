@@ -83,7 +83,7 @@ describe("messages follow the active language", () => {
     expect(formatDate("2026-08-15T10:00:00", "fr")).toBe("15 août 2026");
     applyLang("fr");
     expect(getLang()).toBe("fr");
-    expect(formatFcfa(null)).toBe("Prix sur demande");
+    expect(formatFcfa(null)).toBe("Sur devis");
     expect(formatFcfa(5000)).toBe("5 000 FCFA");
   });
 });

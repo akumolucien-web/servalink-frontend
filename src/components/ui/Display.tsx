@@ -103,8 +103,9 @@ export function StatCard({ value, label, icon, tone = "green", to }: { value: Re
 }
 
 export function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
+  const t = useT();
   return (
-    <nav className="crumbs" aria-label="Breadcrumb">
+    <nav className="crumbs" aria-label={t("common.breadcrumb")}>
       {items.map((item, i) => (
         <span key={i} className="row" style={{ gap: 8 }}>
           {item.to ? <Link to={item.to}>{item.label}</Link> : <span aria-current="page">{item.label}</span>}

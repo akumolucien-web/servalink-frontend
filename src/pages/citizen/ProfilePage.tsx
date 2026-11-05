@@ -8,12 +8,14 @@ import { Button } from "../../components/ui/Button";
 import { Avatar, Banner, PageHeader } from "../../components/ui/Display";
 import { hasErrors, TextField, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
+import { useT } from "../../i18n/I18nProvider";
 import { formatDate } from "../../lib/format";
 import { citiesOf, fold } from "../../lib/locations";
 import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
 
 export function ProfilePage() {
   const { profile, saveProfile, session, hasProviderTools } = useAuth();
+  const t = useT();
   const toast = useToast();
   const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", phone: "" });
   const [agreed, setAgreed] = useState(false);
@@ -39,11 +41,11 @@ export function ProfilePage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
-    if (!form.full_name.trim()) next.full_name = "Enter your full name";
-    if (!form.region) next.region = "Select your region";
-    if (form.region && !form.city) next.city = "Select your town or city";
-    if (!normalizeCmPhone(form.phone)) next.phone = "Enter a Cameroon number, e.g. 6 77 12 34 56";
-    if (needsTerms && !agreed) next.terms = "You must accept the Terms and Privacy notice to continue";
+    if (!form.full_name.trim()) next.full_name = t("auth.nameRequired");
+    if (!form.region) next.region = t("auth.regionRequired");
+    if (form.region && !form.city) next.city = t("auth.cityRequired");
+    if (!normalizeCmPhone(form.phone)) next.phone = t("auth.phoneInvalid");
+    if (needsTerms && !agreed) next.terms = t("onboarding.termsRequired");
     setErrors(next);
     if (hasErrors(next)) return;
     setBusy(true);
@@ -55,34 +57,34 @@ export function ProfilePage() {
         ...(profile_image_key ? { profile_image_key } : {}),
       });
       setPhoto(null);
-      toast.success("Profile saved");
+      toast.success(t("onboarding.saved"));
     } catch (error) {
-      setErrors({ form: error instanceof ApiError ? error.message : "We couldn't save your profile. Try again." });
+      setErrors({ form: error instanceof ApiError ? error.message : t("prof.failed") });
     } finally { setBusy(false); }
   };
 
   return (
     <>
-      <PageHeader title="My profile" subtitle="Your details are shared with providers when you book them." />
+      <PageHeader title={t("prof.title")} subtitle={t("prof.sub")} />
       <div className="two-col">
-        <form className="card card-pad stack" onSubmit={submit} noValidate aria-label="Profile">
+        <form className="card card-pad stack" onSubmit={submit} noValidate aria-label={t("prof.aria")}>
           {errors.form && <Banner tone="danger">{errors.form}</Banner>}
           <div className="form-grid">
-            <TextField className="span-2" label="Full name" autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
-            <TextField label="Phone number" type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <TextField className="span-2" label={t("auth.fullName")} autoComplete="name" value={form.full_name} error={errors.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+            <TextField label={t("auth.phone")} type="tel" placeholder="+237 6XX XXX XXX" autoComplete="tel" value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
           <div className="form-grid"><LocationPicker level="quartier" value={form} errors={errors} onChange={(v) => setForm({ ...form, ...v })} /></div>
-          <TextField label="Email" value={session?.email ?? ""} disabled readOnly hint="Your email is optional and can't be changed here." />
-          <ImagePicker label="Profile photo" file={photo} onChange={setPhoto}
-            hint={profile?.profile_image_key ? "A photo is saved. Choose a new one to replace it." : "JPEG, PNG or WEBP, up to 10 MB."} />
+          <TextField label={t("f.email")} value={session?.email ?? ""} disabled readOnly hint={t("prof.emailHint")} />
+          <ImagePicker label={t("prof.photo")} file={photo} onChange={setPhoto}
+            hint={profile?.profile_image_key ? t("prof.photoSaved") : t("image.hint")} />
           {needsTerms && <TermsCheckbox checked={agreed} error={errors.terms} onChange={setAgreed} />}
-          <div className="row" style={{ justifyContent: "flex-end" }}><Button type="submit" loading={busy}>Save changes</Button></div>
+          <div className="row" style={{ justifyContent: "flex-end" }}><Button type="submit" loading={busy}>{t("common.save")}</Button></div>
         </form>
         <aside className="card card-pad stack-sm" style={{ justifyItems: "start" }}>
           <Avatar name={profile?.full_name} src={ownPhoto} size={72} />
           <strong>{profile?.full_name}</strong>
           <span className="muted small">{session?.email || formatCmPhone(session?.phone ?? "")}</span>
-          {profile?.created_at && <span className="muted xs">Member since {formatDate(profile.created_at)}</span>}
+          {profile?.created_at && <span className="muted xs">{t("prof.member", { date: formatDate(profile.created_at) })}</span>}
         </aside>
       </div>
     </>

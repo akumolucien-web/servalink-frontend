@@ -8,12 +8,15 @@ import { Button } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { hasErrors, SelectField, TextAreaField, TextField, type Errors } from "../../components/ui/Field";
 import { Modal, useConfirm, useToast } from "../../components/ui/Overlay";
+import { useLang, useT } from "../../i18n/I18nProvider";
+import { categoryLabel } from "../../lib/format";
 import { regionOfCity } from "../../lib/locations";
 import { useResource } from "../../lib/useResource";
 import { CategoryRequestModal } from "../citizen/BecomeProviderPage";
 
 export function ProviderServicesPage() {
   const { session } = useAuth();
+  const t = useT();
   const toast = useToast();
   const confirm = useConfirm();
   const services = useResource(() => api.myServices(session!.sub), [session?.sub]);
@@ -21,25 +24,25 @@ export function ProviderServicesPage() {
 
   const remove = async (service: Service) => {
     const ok = await confirm({
-      title: "Delete this service?", confirmLabel: "Delete service", tone: "danger",
-      message: `"${service.name}" will no longer appear in search or be bookable. Existing bookings are not affected.`,
+      title: t("ps.deleteTitle"), confirmLabel: t("ps.deleteConfirm"), tone: "danger",
+      message: t("ps.deleteMsg", { name: service.name }),
     });
     if (!ok) return;
-    try { await api.deleteService(service.service_id); toast.success("Service deleted"); }
-    catch (error) { toast.error(error instanceof ApiError ? error.message : "We couldn't delete that service."); }
+    try { await api.deleteService(service.service_id); toast.success(t("ps.deleted")); }
+    catch (error) { toast.error(error instanceof ApiError ? error.message : t("ps.deleteFailed")); }
     await services.reload();
   };
 
   return (
     <>
-      <PageHeader title="My services" subtitle="The services customers can book from you."
-        actions={<Button icon={<Plus size={16} />} onClick={() => setEditing("new")}>Add a service</Button>} />
+      <PageHeader title={t("ps.title")} subtitle={t("ps.sub")}
+        actions={<Button icon={<Plus size={16} />} onClick={() => setEditing("new")}>{t("ps.add")}</Button>} />
       {services.loading && !services.data ? <CardSkeleton rows={2} />
-        : services.error ? <ErrorState error={services.error} onRetry={services.reload} title="We couldn't load your services" />
+        : services.error ? <ErrorState error={services.error} onRetry={services.reload} title={t("ps.error")} />
           : services.data!.length === 0 ? (
-            <div className="card"><EmptyState icon={<Wrench size={24} />} title="No services yet"
-              action={<Button onClick={() => setEditing("new")}>Add your first service</Button>}>
-              Customers find you through the services you list. Add what you offer and the town you work in.
+            <div className="card"><EmptyState icon={<Wrench size={24} />} title={t("ps.none")}
+              action={<Button onClick={() => setEditing("new")}>{t("pd.addFirst")}</Button>}>
+              {t("ps.noneText")}
             </EmptyState></div>
           ) : (
             <div className="card">
@@ -52,8 +55,8 @@ export function ProviderServicesPage() {
                     <ServicePrice service={s} />
                   </div>
                   <div className="row" style={{ gap: 8 }}>
-                    <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => setEditing(s)}>Edit</Button>
-                    <Button size="sm" variant="danger-outline" icon={<Trash2 size={14} />} onClick={() => remove(s)}>Delete</Button>
+                    <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => setEditing(s)}>{t("ps.edit")}</Button>
+                    <Button size="sm" variant="danger-outline" icon={<Trash2 size={14} />} onClick={() => remove(s)}>{t("ps.delete")}</Button>
                   </div>
                 </div>
               ))}
@@ -66,6 +69,8 @@ export function ProviderServicesPage() {
 
 function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | null; onClose: () => void; onSaved: () => void }) {
   const { profile, provider } = useAuth();
+  const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const categories = useResource(() => api.categories(), []);
   const isNew = target === "new";
@@ -93,13 +98,13 @@ function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const next: typeof errors = {};
-    if (isNew && !form.category_id) next.category_id = "Choose a category";
-    if (isNew && !loc.region) next.region = "Choose a region";
-    if (isNew && !loc.city) next.city = "Choose the town you work in";
-    if (!form.name.trim()) next.name = "Enter a service name";
+    if (isNew && !form.category_id) next.category_id = t("home.chooseCategory");
+    if (isNew && !loc.region) next.region = t("home.errRegion");
+    if (isNew && !loc.city) next.city = t("ps.errTown");
+    if (!form.name.trim()) next.name = t("ps.errName");
     const priceText = form.price_from.trim();
     const price = priceText ? Number(priceText) : null;
-    if (price !== null && !(Number.isInteger(price) && price >= 100 && price <= 10_000_000)) next.price_from = "Enter a whole number between 100 and 10 000 000 FCFA, or leave it empty";
+    if (price !== null && !(Number.isInteger(price) && price >= 100 && price <= 10_000_000)) next.price_from = t("ps.errPrice");
     setErrors(next);
     if (hasErrors(next)) return;
     setBusy(true);
@@ -107,37 +112,37 @@ function ServiceModal({ target, onClose, onSaved }: { target: Service | "new" | 
       const body = { name: form.name.trim(), description: form.description.trim(), price_from: price, price_note: form.price_note.trim() };
       if (existing) await api.updateService(existing.service_id, body);
       else await api.createService({ category_id: form.category_id, region: loc.region, city: loc.city, ...body });
-      toast.success(existing ? "Service updated" : "Service added");
+      toast.success(t(existing ? "ps.updated" : "ps.addedToast"));
       onSaved(); onClose();
     } catch (error) {
-      setErrors({ form: error instanceof ApiError ? error.message : "We couldn't save the service." });
+      setErrors({ form: error instanceof ApiError ? error.message : t("ps.saveFailed") });
     } finally { setBusy(false); }
   };
 
   return (
     <>
-      <Modal open={!!target} title={existing ? "Edit service" : "Add a service"} onClose={onClose}>
+      <Modal open={!!target} title={t(existing ? "ps.editTitle" : "ps.add")} onClose={onClose}>
         <form onSubmit={submit} noValidate>
           <div className="modal-body form stack">
             {errors.form && <Banner tone="danger">{errors.form}</Banner>}
             {isNew && (
               <>
-                <SelectField label="Category" value={form.category_id} error={errors.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
-                  <option value="">Choose a category</option>
-                  {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
+                <SelectField label={t("f.category")} value={form.category_id} error={errors.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
+                  <option value="">{t("home.chooseCategory")}</option>
+                  {(categories.data ?? []).map((c) => <option key={c.category_id} value={c.category_id}>{categoryLabel(c, lang)}</option>)}
                 </SelectField>
-                <p className="small" style={{ marginTop: -8 }}>Missing a category? <button type="button" style={{ background: "none", border: 0, padding: 0, color: "var(--green-700)", fontWeight: 600, textDecoration: "underline" }} onClick={() => setRequesting(true)}>Request one</button></p>
+                <p className="small" style={{ marginTop: -8 }}>{t("ps.missing")} <button type="button" style={{ background: "none", border: 0, padding: 0, color: "var(--green-700)", fontWeight: 600, textDecoration: "underline" }} onClick={() => setRequesting(true)}>{t("ps.requestOne")}</button></p>
                 <LocationPicker level="city" value={loc} onChange={setLoc} errors={errors} />
               </>
             )}
-            {existing && <p className="hint-box">Category ({existing.category_name}) and town ({existing.city}) can't be changed. Add a new service for another town or category.</p>}
-            <TextField label="Service name" placeholder="e.g. Leaking pipe repair" value={form.name} error={errors.name} maxLength={120} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <TextAreaField label="Description" optional value={form.description} maxLength={1000} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <TextField label="Starting price (FCFA)" optional type="number" inputMode="numeric" min={100} max={10000000} step={1} value={form.price_from} error={errors.price_from}
-              hint="Leave empty to show &quot;Price on request&quot;." onChange={(e) => setForm({ ...form, price_from: e.target.value })} />
-            <TextField label="Price note" optional value={form.price_note} maxLength={120} placeholder="e.g. per hour, materials extra" onChange={(e) => setForm({ ...form, price_note: e.target.value })} />
+            {existing && <p className="hint-box">{t("ps.locked", { category: existing.category_name, city: existing.city })}</p>}
+            <TextField label={t("ps.name")} placeholder={t("ps.namePlaceholder")} value={form.name} error={errors.name} maxLength={120} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <TextAreaField label={t("f.description")} optional value={form.description} maxLength={1000} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <TextField label={t("ps.price")} optional type="number" inputMode="numeric" min={100} max={10000000} step={1} value={form.price_from} error={errors.price_from}
+              hint={t("ps.priceHint")} onChange={(e) => setForm({ ...form, price_from: e.target.value })} />
+            <TextField label={t("ps.priceNote")} optional value={form.price_note} maxLength={120} placeholder={t("ps.priceNotePlaceholder")} onChange={(e) => setForm({ ...form, price_note: e.target.value })} />
           </div>
-          <div className="modal-foot"><Button variant="ghost" onClick={onClose}>Cancel</Button><Button type="submit" loading={busy}>{existing ? "Save changes" : "Add service"}</Button></div>
+          <div className="modal-foot"><Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button><Button type="submit" loading={busy}>{t(existing ? "common.save" : "ps.addSubmit")}</Button></div>
         </form>
       </Modal>
       <CategoryRequestModal open={requesting} onClose={() => setRequesting(false)} onDone={() => {}} />

@@ -13,6 +13,8 @@ export type BookingAction =
 export interface Category {
   category_id: string;
   category_name: string;
+  /** French name; older records only have category_name. */
+  category_name_fr?: string;
   description: string;
   status: string;
 }

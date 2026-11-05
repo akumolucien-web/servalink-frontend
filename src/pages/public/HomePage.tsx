@@ -9,7 +9,8 @@ import { Button, ButtonLink } from "../../components/ui/Button";
 import { EmptyState, ErrorState, Skeleton } from "../../components/ui/Display";
 import { LocationPicker } from "../../components/domain/LocationPicker";
 import { SelectField } from "../../components/ui/Field";
-import { useT, type Key } from "../../i18n/I18nProvider";
+import { useLang, useT, type Key } from "../../i18n/I18nProvider";
+import { categoryLabel } from "../../lib/format";
 import { useResource } from "../../lib/useResource";
 
 const STEPS: { icon: typeof Search; n: number }[] = [
@@ -32,6 +33,7 @@ const FAQ = [1, 2, 3, 4, 5] as const;
 export function HomePage() {
   const navigate = useNavigate();
   const t = useT();
+  const { lang } = useLang();
   const categories = useResource(() => api.categories(), []);
   const [category, setCategory] = useState("");
   const [loc, setLoc] = useState({ region: "", city: "", quartier: "" });
@@ -60,7 +62,7 @@ export function HomePage() {
             <SelectField label={t("home.category")} value={category} error={errors.category}
               onChange={(e) => setCategory(e.target.value)} disabled={categories.loading || !list.length}>
               <option value="">{categories.loading ? t("home.loadingCategories") : list.length ? t("home.chooseCategory") : t("home.noCategoriesShort")}</option>
-              {list.map((c) => <option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
+              {list.map((c) => <option key={c.category_id} value={c.category_name}>{categoryLabel(c, lang)}</option>)}
             </SelectField>
             <LocationPicker level="city" value={loc} onChange={setLoc} errors={errors} />
             <Button type="submit" size="lg" icon={<Search size={18} />}>{t("home.findProviders")}</Button>
@@ -93,7 +95,7 @@ export function HomePage() {
                 <li key={c.category_id}>
                   <Link className="home-cat" to={`/search?category=${encodeURIComponent(c.category_name)}`}>
                     <span className="ci"><CategoryIcon name={c.category_name} size={26} /></span>
-                    <span className="name">{c.category_name}</span>
+                    <span className="name">{categoryLabel(c, lang)}</span>
                     <span className="go small">{t("home.findProvidersLink")} <ArrowRight size={14} aria-hidden="true" /></span>
                   </Link>
                 </li>

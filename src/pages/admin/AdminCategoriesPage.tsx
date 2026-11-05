@@ -6,12 +6,14 @@ import { Button } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader, StatusBadge } from "../../components/ui/Display";
 import { useConfirm, useToast } from "../../components/ui/Overlay";
 import { Tabs } from "../../components/ui/Tabs";
+import { useT } from "../../i18n/I18nProvider";
 import { formatDateTime } from "../../lib/format";
 import { focusDomId, useFocusTarget } from "../../lib/useFocusTarget";
 import { REQUEST_STATUS } from "../../lib/status";
 import { useResource } from "../../lib/useResource";
 
 export function AdminCategoriesPage() {
+  const t = useT();
   const toast = useToast();
   const confirm = useConfirm();
   const requests = useResource(() => api.adminCategoryRequests(), []);
@@ -35,14 +37,14 @@ export function AdminCategoriesPage() {
   const decide = async (request: CategoryRequest, action: "APPROVE" | "REJECT") => {
     const approve = action === "APPROVE";
     const ok = await confirm({
-      title: approve ? `Approve "${request.proposed_name}"?` : `Reject "${request.proposed_name}"?`,
-      message: approve ? "A new category is created and becomes available to providers and in search." : "The request is closed. The category won't be created.",
-      confirmLabel: approve ? "Approve category" : "Reject request", tone: approve ? "primary" : "danger",
+      title: t(approve ? "ac.approveTitle" : "ac.rejectTitle", { name: request.proposed_name }),
+      message: t(approve ? "ac.approveMsg" : "ac.rejectMsg"),
+      confirmLabel: t(approve ? "ac.approveConfirm" : "bk.reject.confirm"), tone: approve ? "primary" : "danger",
     });
     if (!ok) return;
     setBusy(request.request_id);
-    try { await api.adminProcessCategoryRequest(request.request_id, action); toast.success(approve ? "Category approved" : "Request rejected"); }
-    catch (error) { toast.error(error instanceof ApiError ? error.message : "That didn't work. Try again."); }
+    try { await api.adminProcessCategoryRequest(request.request_id, action); toast.success(t(approve ? "ac.approvedToast" : "ac.rejectedToast")); }
+    catch (error) { toast.error(error instanceof ApiError ? error.message : t("common.errGeneric")); }
     setBusy(undefined);
     if (id) navigate("/admin/categories", { replace: true });
     await requests.reload();
@@ -50,23 +52,23 @@ export function AdminCategoriesPage() {
 
   return (
     <>
-      <PageHeader title="Category requests" subtitle="Providers can't use a new category until you approve it." />
+      <PageHeader title={t("ws.categoryRequests")} subtitle={t("ac.sub")} />
       {missing && (
         <div style={{ marginBottom: 16 }}>
-          <Banner tone="warning" action={<Link className="small nowrap" to="/admin/categories">View all requests</Link>}>
-            <strong>We couldn't find that category request.</strong>
-            <span>The link may be out of date, or the request may have been removed.</span>
+          <Banner tone="warning" action={<Link className="small nowrap" to="/admin/categories">{t("ac.viewAll")}</Link>}>
+            <strong>{t("ac.missing")}</strong>
+            <span>{t("ac.missingText")}</span>
           </Banner>
         </div>
       )}
       <div className="stack">
-        <Tabs label="Request status" value={tab} onChange={setTab} tabs={[
-          { id: "pending", label: "Pending", count: requests.data ? all.filter((r) => r.status === "PENDING").length : undefined },
-          { id: "processed", label: "Processed", count: requests.data ? all.filter((r) => r.status !== "PENDING").length : undefined },
+        <Tabs label={t("ac.statusTabs")} value={tab} onChange={setTab} tabs={[
+          { id: "pending", label: t("status.request.PENDING"), count: requests.data ? all.filter((r) => r.status === "PENDING").length : undefined },
+          { id: "processed", label: t("ac.processed"), count: requests.data ? all.filter((r) => r.status !== "PENDING").length : undefined },
         ]} />
         {requests.loading && !requests.data ? <CardSkeleton rows={2} />
-          : requests.error ? <ErrorState error={requests.error} onRetry={requests.reload} title="We couldn't load requests" />
-            : shown.length === 0 ? <div className="card"><EmptyState icon={<Tags size={24} />} title={tab === "pending" ? "No pending requests" : "Nothing processed yet"}>Category requests from providers appear here.</EmptyState></div>
+          : requests.error ? <ErrorState error={requests.error} onRetry={requests.reload} title={t("ac.error")} />
+            : shown.length === 0 ? <div className="card"><EmptyState icon={<Tags size={24} />} title={t(tab === "pending" ? "ac.noPending" : "ac.nothingProcessed")}>{t("ac.emptyText")}</EmptyState></div>
               : (
                 <div className="stack">
                   {shown.map((r) => (
@@ -74,15 +76,15 @@ export function AdminCategoriesPage() {
                       <div className="row-between">
                         <div>
                           <strong>{r.proposed_name}</strong>
-                          <div className="muted xs">Requested by {names.get(r.provider_id) ?? "a customer"} · {formatDateTime(r.created_at)}</div>
+                          <div className="muted xs">{t("ac.requestedBy", { name: names.get(r.provider_id) ?? t("ac.aCustomer"), date: formatDateTime(r.created_at) })}</div>
                         </div>
-                        <StatusBadge label={REQUEST_STATUS[r.status].label} tone={REQUEST_STATUS[r.status].tone} />
+                        <StatusBadge label={t(REQUEST_STATUS[r.status].label)} tone={REQUEST_STATUS[r.status].tone} />
                       </div>
                       <p className="small">{r.description}</p>
                       {r.status === "PENDING" && (
                         <div className="actions">
-                          <Button size="sm" loading={busy === r.request_id} disabled={!!busy} onClick={() => decide(r, "APPROVE")}>Approve</Button>
-                          <Button size="sm" variant="danger-outline" disabled={!!busy} onClick={() => decide(r, "REJECT")}>Reject</Button>
+                          <Button size="sm" loading={busy === r.request_id} disabled={!!busy} onClick={() => decide(r, "APPROVE")}>{t("dec.approve")}</Button>
+                          <Button size="sm" variant="danger-outline" disabled={!!busy} onClick={() => decide(r, "REJECT")}>{t("dec.reject")}</Button>
                         </div>
                       )}
                     </article>

@@ -7,10 +7,12 @@ import { Button } from "../../components/ui/Button";
 import { Banner, CardSkeleton, EmptyState, ErrorState, PageHeader } from "../../components/ui/Display";
 import { TextField } from "../../components/ui/Field";
 import { Modal, useConfirm, useToast } from "../../components/ui/Overlay";
+import { useT } from "../../i18n/I18nProvider";
 import { useResource } from "../../lib/useResource";
 
 export function ProviderGalleryPage() {
   const { session } = useAuth();
+  const t = useT();
   const toast = useToast();
   const confirm = useConfirm();
   const gallery = useResource(() => api.providerGallery(session!.sub), [session?.sub]);
@@ -24,55 +26,55 @@ export function ProviderGalleryPage() {
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!file) { setError("Choose a photo to upload"); return; }
+    if (!file) { setError(t("pg.errChoose")); return; }
     setBusy(true); setError(undefined);
     try {
       const photo_key = await uploadImage(file, "GALLERY");
       await api.createGalleryItem({ photo_key, caption: caption.trim() });
-      toast.success("Photo added to your gallery");
+      toast.success(t("pg.added"));
       close(); await gallery.reload();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : "We couldn't add that photo. Try again.");
+      setError(caught instanceof ApiError ? caught.message : t("pg.addFailed"));
     } finally { setBusy(false); }
   };
 
   const remove = async (id: string) => {
-    if (!(await confirm({ title: "Remove this photo?", confirmLabel: "Remove photo", tone: "danger", message: "It will disappear from your public profile." }))) return;
-    try { await api.deleteGalleryItem(id); toast.success("Photo removed"); }
-    catch (caught) { toast.error(caught instanceof ApiError ? caught.message : "We couldn't remove that photo."); }
+    if (!(await confirm({ title: t("pg.removeTitle"), confirmLabel: t("pg.removePhoto"), tone: "danger", message: t("pg.removeMsg") }))) return;
+    try { await api.deleteGalleryItem(id); toast.success(t("pg.removed")); }
+    catch (caught) { toast.error(caught instanceof ApiError ? caught.message : t("pg.removeFailed")); }
     await gallery.reload();
   };
 
   return (
     <>
-      <PageHeader title="Work gallery" subtitle="Show customers examples of your completed work."
-        actions={<Button icon={<Plus size={16} />} onClick={() => setAdding(true)}>Add photo</Button>} />
+      <PageHeader title={t("pg.title")} subtitle={t("pg.sub")}
+        actions={<Button icon={<Plus size={16} />} onClick={() => setAdding(true)}>{t("pg.add")}</Button>} />
       {gallery.loading && !gallery.data ? <CardSkeleton rows={1} />
-        : gallery.error ? <ErrorState error={gallery.error} onRetry={gallery.reload} title="We couldn't load your gallery" />
+        : gallery.error ? <ErrorState error={gallery.error} onRetry={gallery.reload} title={t("pg.error")} />
           : gallery.data!.length === 0 ? (
-            <div className="card"><EmptyState icon={<Images size={24} />} title="Your gallery is empty"
-              action={<Button onClick={() => setAdding(true)}>Add your first photo</Button>}>
-              Photos of finished jobs help customers trust you. Add a caption to explain the work.
+            <div className="card"><EmptyState icon={<Images size={24} />} title={t("pg.emptyTitle")}
+              action={<Button onClick={() => setAdding(true)}>{t("pg.addFirst")}</Button>}>
+              {t("pg.emptyText")}
             </EmptyState></div>
           ) : (
             <div className="gallery-grid">
               {gallery.data!.map((item) => (
                 <figure key={item.gallery_item_id} className="gallery-item" style={{ margin: 0 }}>
-                  {item.photo_url && <img src={item.photo_url} alt={item.caption || "Completed work"} loading="lazy" />}
-                  <Button className="remove" size="sm" variant="light" icon={<Trash2 size={14} />} aria-label="Remove photo" onClick={() => remove(item.gallery_item_id)} />
+                  {item.photo_url && <img src={item.photo_url} alt={item.caption || t("pp.workAlt")} loading="lazy" />}
+                  <Button className="remove" size="sm" variant="light" icon={<Trash2 size={14} />} aria-label={t("pg.removePhoto")} onClick={() => remove(item.gallery_item_id)} />
                   {item.caption && <figcaption>{item.caption}</figcaption>}
                 </figure>
               ))}
             </div>
           )}
-      <Modal open={adding} title="Add a photo" onClose={close}>
+      <Modal open={adding} title={t("pg.addTitle")} onClose={close}>
         <form onSubmit={submit} noValidate>
           <div className="modal-body form stack">
             {error && <Banner tone="danger">{error}</Banner>}
-            <ImagePicker label="Photo" optional={false} file={file} onChange={setFile} />
-            <TextField label="Caption" optional maxLength={200} value={caption} onChange={(e) => setCaption(e.target.value)} />
+            <ImagePicker label={t("f.photo")} optional={false} file={file} onChange={setFile} />
+            <TextField label={t("pg.caption")} optional maxLength={200} value={caption} onChange={(e) => setCaption(e.target.value)} />
           </div>
-          <div className="modal-foot"><Button variant="ghost" onClick={close}>Cancel</Button><Button type="submit" loading={busy}>Upload photo</Button></div>
+          <div className="modal-foot"><Button variant="ghost" onClick={close}>{t("common.cancel")}</Button><Button type="submit" loading={busy}>{t("pg.upload")}</Button></div>
         </form>
       </Modal>
     </>
