@@ -10,6 +10,7 @@ import { Banner } from "../../components/ui/Display";
 import { hasErrors, type Errors } from "../../components/ui/Field";
 import { useToast } from "../../components/ui/Overlay";
 import { FullPageLoading } from "../../auth/guards";
+import { withLang } from "../../i18n/core";
 import { useT } from "../../i18n/I18nProvider";
 import { formatCmPhone, normalizeCmPhone } from "../../lib/phone";
 import { safeNext } from "../../lib/redirect";
@@ -43,10 +44,10 @@ export function OnboardingPage() {
     if (hasErrors(next)) return;
     setBusy(true);
     try {
-      await saveProfile({
+      await saveProfile(withLang({
         full_name: form.full_name.trim(), region: form.region, city: form.city, phone: form.phone.trim(),
         ...(form.quartier.trim() ? { quartier: form.quartier.trim() } : {}), accept_terms: true,
-      });
+      }));
       toast.success(t("onboarding.saved"));
       navigate(destination, { replace: true });
     } catch (error) {

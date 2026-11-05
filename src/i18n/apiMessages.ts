@@ -3,7 +3,7 @@ import type { Lang } from "./core";
 /** French for the exact English messages the backend, the sign-in service and the API client can show users. */
 const FR: Record<string, string> = {
   // profile / location / phone / terms
-  "Accept the Terms and Privacy notice to continue": "Acceptez les Conditions générales et la Politique de confidentialité pour continuer",
+  "Accept the Terms and Privacy notice to continue": "Acceptez les Conditions générales d'utilisation et la Politique de confidentialité pour continuer",
   "Select a valid region and city": "Sélectionnez une région et une ville valides",
   "Enter a valid Cameroon phone number": "Saisissez un numéro de téléphone camerounais valide",
   "Use a Cameroon mobile number, e.g. +237 6 77 12 34 56": "Utilisez un numéro mobile camerounais, ex. +237 6 77 12 34 56",

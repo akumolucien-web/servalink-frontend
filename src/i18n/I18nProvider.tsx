@@ -23,7 +23,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       void saveProfile({
         full_name: current.full_name, region: current.region, city: current.city, phone: current.phone,
         quartier: current.quartier ?? "", language: next,
-      }).catch(() => { /* the choice is still stored on this device */ });
+      }).catch(() => { console.warn("Could not save the language to the profile; kept on this device."); });
     }
   }, [saveProfile]);
 

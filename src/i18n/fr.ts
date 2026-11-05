@@ -154,7 +154,7 @@ export const fr: Record<keyof typeof en, string> = {
   "onboarding.save": "Enregistrer et continuer",
   "onboarding.saved": "Profil enregistré",
   "onboarding.failed": "Impossible d'enregistrer votre profil.",
-  "onboarding.termsRequired": "Vous devez accepter les Conditions générales et la Politique de confidentialité pour continuer",
+  "onboarding.termsRequired": "Vous devez accepter les Conditions générales d'utilisation et la Politique de confidentialité pour continuer",
 
   // --- location picker ---
   "loc.region": "Région",

@@ -36,3 +36,6 @@ export function applyLang(lang: Lang): void {
   try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch { /* private mode: the choice lasts for this visit */ }
   if (typeof document !== "undefined") document.documentElement.lang = lang;
 }
+
+/** Profile-creation bodies carry the language in use, so the backend default (fr) never overrides an English browser. */
+export const withLang = <T extends object>(body: T): T & { language: Lang } => ({ ...body, language: current });
