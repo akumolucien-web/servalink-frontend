@@ -5,7 +5,7 @@ import { getLang } from "../i18n/core";
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
-    super(translateApiMessage(message, getLang())); // text is shown to users, so it follows the active language
+    super(translateApiMessage(message, getLang(), status)); // text is shown to users, so it follows the active language
     this.status = status;
   }
 }

@@ -1,5 +1,7 @@
 import type { Lang } from "./core";
 
+const SERVER_FALLBACK = "Un problème est survenu. Réessayez dans un instant.";
+
 /** French for the exact English messages the backend, the sign-in service and the API client can show users. */
 const FR: Record<string, string> = {
   // profile / location / phone / terms
@@ -47,6 +49,19 @@ const FR: Record<string, string> = {
   "Too many attempts": "Trop de tentatives. Réessayez plus tard.",
   "Too many attempts. Wait a few minutes and try again.": "Trop de tentatives. Patientez quelques minutes puis réessayez.",
   "Too Many Requests": "Trop de demandes. Réessayez dans un instant.", // API Gateway throttle (429)
+  // gateway / runtime messages (not from our Lambdas)
+  "Internal server error": SERVER_FALLBACK,
+  "Endpoint request timed out": "Le service met trop de temps à répondre. Réessayez dans un instant.",
+  "Missing Authentication Token": "Impossible de vérifier votre connexion. Veuillez vous reconnecter.",
+  // admin / profile / images
+  "Unable to access user profile": "Impossible d'accéder à votre profil. Réessayez dans un instant.",
+  "Uploaded image was not found": "L'image téléversée est introuvable. Réessayez.",
+  "Invalid image key": "Image non valide. Choisissez-en une autre.",
+  "Provider's Cognito identity was not found in this user pool": "Le compte de connexion de ce prestataire est introuvable.",
+  "Admin access required": "Accès réservé à l'administration",
+  "Only a pending provider application can be rejected": "Seule une candidature de prestataire en attente peut être refusée",
+  "This report has already been processed": "Ce signalement a déjà été traité",
+  "This category request has already been processed": "Cette demande de catégorie a déjà été traitée",
   // not found / access
   "Booking not found": "Réservation introuvable",
   "Provider not found": "Prestataire introuvable",
@@ -79,10 +94,13 @@ const FR: Record<string, string> = {
   "That code isn't right. Check it and try again.": "Ce code n'est pas correct. Vérifiez-le et réessayez.",
   "That code has expired. Request a new one.": "Ce code a expiré. Demandez-en un nouveau.",
   "Use at least 8 characters with an uppercase letter, a lowercase letter and a number.": "Utilisez au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
+  "We couldn't send the code by SMS. Check the number and try again.": "Impossible d'envoyer le code par SMS. Vérifiez le numéro et réessayez.",
   "Check the details you entered and try again.": "Vérifiez les informations saisies et réessayez.",
 };
 
-/** Exact-match lookup; anything unknown (or any English request) passes through unchanged. */
-export function translateApiMessage(message: string, lang: Lang): string {
-  return lang === "fr" ? FR[message] ?? message : message;
+/** Exact-match lookup; anything unknown (or any English request) passes through unchanged, except that an unmapped
+ *  server error (status >= 500) gets a generic French message instead of raw English. */
+export function translateApiMessage(message: string, lang: Lang, status?: number): string {
+  if (lang !== "fr") return message;
+  return FR[message] ?? (status !== undefined && status >= 500 ? SERVER_FALLBACK : message);
 }

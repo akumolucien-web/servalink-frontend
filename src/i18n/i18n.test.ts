@@ -63,7 +63,35 @@ describe("translateApiMessage", () => {
       "You can't vouch for yourself", "You already have 5 vouch requests waiting", "This client has already vouched 3 times this year",
       "This vouch link is invalid or has expired", "Verify your phone number first", "Too many codes requested", "Too many attempts",
       "Too Many Requests", "Use a Cameroon mobile number, e.g. +237 6 77 12 34 56",
+      "Internal server error", "Endpoint request timed out", "Missing Authentication Token", "Unable to access user profile",
+      "Uploaded image was not found", "Invalid image key", "Provider's Cognito identity was not found in this user pool",
+      "Admin access required", "Only a pending provider application can be rejected", "This report has already been processed",
+      "This category request has already been processed",
     ]) expect(translateApiMessage(message, "fr"), message).not.toBe(message);
+  });
+});
+
+describe("unmapped server errors", () => {
+  it("get a generic French message at status >= 500 only, and mapped messages are unchanged", () => {
+    const generic = "Un problème est survenu. Réessayez dans un instant.";
+    expect(translateApiMessage("Boom from nowhere", "fr", 500)).toBe(generic);
+    expect(translateApiMessage("Boom from nowhere", "fr", 502)).toBe(generic);
+    expect(translateApiMessage("Boom from nowhere", "fr", 400)).toBe("Boom from nowhere");
+    expect(translateApiMessage("Boom from nowhere", "fr")).toBe("Boom from nowhere");
+    expect(translateApiMessage("Boom from nowhere", "en", 500)).toBe("Boom from nowhere");
+    expect(translateApiMessage("Endpoint request timed out", "fr", 504)).toBe("Le service met trop de temps à répondre. Réessayez dans un instant.");
+    applyLang("fr");
+    expect(new ApiError(500, "Traceback (most recent call last)").message).toBe(generic);
+    expect(new ApiError(404, "Booking not found").message).toBe("Réservation introuvable");
+  });
+  it("Cognito SMS delivery failures and invalid parameters are translated, never raw", () => {
+    applyLang("fr");
+    expect(friendlyAuthError("CodeDeliveryFailureException").message).toBe("Impossible d'envoyer le code par SMS. Vérifiez le numéro et réessayez.");
+    expect(friendlyAuthError("InvalidParameterException", "1 validation error detected: Value at 'x' failed").message)
+      .toBe("Vérifiez les informations saisies et réessayez.");
+    applyLang("en");
+    expect(friendlyAuthError("CodeDeliveryFailureException").message).toBe("We couldn't send the code by SMS. Check the number and try again.");
+    expect(friendlyAuthError("InvalidParameterException", "raw cognito text").message).toBe("Check the details you entered and try again.");
   });
 });
 
