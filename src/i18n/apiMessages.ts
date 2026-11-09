@@ -46,6 +46,7 @@ const FR: Record<string, string> = {
   "Too many codes requested": "Trop de codes demandés. Réessayez plus tard.",
   "Too many attempts": "Trop de tentatives. Réessayez plus tard.",
   "Too many attempts. Wait a few minutes and try again.": "Trop de tentatives. Patientez quelques minutes puis réessayez.",
+  "Too Many Requests": "Trop de demandes. Réessayez dans un instant.", // API Gateway throttle (429)
   // not found / access
   "Booking not found": "Réservation introuvable",
   "Provider not found": "Prestataire introuvable",
