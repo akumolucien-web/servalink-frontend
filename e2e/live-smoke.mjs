@@ -56,7 +56,7 @@ await check("Cognito is configured: a sign-in for an unknown user gets a Cognito
   const banner = page.locator(".banner.danger").first();
   await banner.waitFor({ timeout: 20000 });
   const text = await banner.innerText();
-  if (!/couldn't find an account|Incorrect email or password/i.test(text)) throw new Error("unexpected message: " + text);
+  if (!/couldn't find an account|Incorrect phone number or password/i.test(text)) throw new Error("unexpected message: " + text);
   console.log("        Cognito said:", JSON.stringify(text));
 });
 await check("protected deep links send a signed-out visitor to login and remember the destination", async () => {

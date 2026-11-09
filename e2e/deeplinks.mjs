@@ -1,3 +1,4 @@
+// NOTE: still email-based; needs porting to phone sign-in.
 // Deep-link E2E. The links under test are the ones the REAL notification Lambda produced (read from the local
 // outbox), opened in a real browser by the right and the wrong people, at desktop and phone width.
 // Prerequisites: `python -m local_dev.server --seed minimal` (frontend URL http://127.0.0.1:5273) and `npm run dev:local -- --port 5273`.

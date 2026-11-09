@@ -1,3 +1,4 @@
+// NOTE: still email-based; needs porting to phone sign-in.
 // Opens the notification deep links on the LIVE site as the two live E2E test users (real Cognito login).
 // Needs E2E_STATE = path to the JSON written by the live end-to-end run (ids + test-account passwords). Never prints passwords.
 import fs from "node:fs";
