@@ -68,6 +68,7 @@ export function LoginPage() {
         <div className="auth-or" aria-hidden="true">{t("auth.or")}</div>
         <p className="auth-switch">{t("login.noAccount")}<Link to={withNext("/register", next)}>{t("login.signUp")}</Link></p>
       </form>
+      <p className="auth-legacy">{t("login.legacyBefore")} <Link to="/register">{t("login.legacyLink")}</Link> {t("login.legacyAfter")}</p>
     </section>
   );
 }
