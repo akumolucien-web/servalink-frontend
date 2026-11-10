@@ -35,7 +35,7 @@ export function PublicNav() {
           ) : (
             <>
               <ButtonLink to="/login" variant="ghost" size="sm" className="hide-sm">{t("nav.login")}</ButtonLink>
-              <ButtonLink to="/register" size="sm">{t("nav.register")}</ButtonLink>
+              <ButtonLink to="/register" size="sm" className="hide-xs">{t("nav.register")}</ButtonLink>
             </>
           )}
           <button className="menu-btn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}>
@@ -47,6 +47,7 @@ export function PublicNav() {
         <nav className="mobile-sheet" aria-label={t("nav.mobile")}>
           {links}
           {!signedIn && <Link to="/login">{t("nav.login")}</Link>}
+          {!signedIn && <Link className="sheet-only-xs" to="/register">{t("nav.register")}</Link>}
         </nav>
       )}
     </header>

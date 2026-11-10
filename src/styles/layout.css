@@ -15,6 +15,12 @@
   .public-actions .hide-sm { display: none; }
   .public-nav .inner { gap: 12px; }
 }
+/* Phones: "Create account" moves from the header bar into the menu so the bar fits. */
+.mobile-sheet a.sheet-only-xs { display: none; }
+@media (max-width: 480px) {
+  .public-actions .hide-xs { display: none; }
+  .mobile-sheet a.sheet-only-xs { display: block; }
+}
 .mobile-sheet { border-top: 1px solid var(--border); background: var(--surface); padding: 8px var(--gutter) 16px; display: grid; gap: 4px; }
 .mobile-sheet a { padding: 12px 8px; color: var(--text); font-weight: 500; border-radius: 8px; }
 .mobile-sheet a:hover { background: var(--surface-muted); text-decoration: none; }
