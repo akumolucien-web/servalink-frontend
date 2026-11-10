@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { api, ApiError, uploadImage } from "../../api";
+import { ApiError, uploadImage } from "../../api";
 import { useAuth } from "../../auth/AuthContext";
 import { LocationPicker } from "../../components/domain/LocationPicker";
 import { TermsCheckbox } from "../../components/domain/Legal";
@@ -16,14 +16,13 @@ import { formatCmPhone } from "../../lib/phone";
 import { OPTIONS as LANGUAGES } from "../../layouts/LanguageSwitch";
 
 export function ProfilePage() {
-  const { profile, saveProfile, session, hasProviderTools } = useAuth();
+  const { profile, saveProfile, session } = useAuth();
   const t = useT();
   const { lang, setLang } = useLang();
   const toast = useToast();
   const [form, setForm] = useState({ full_name: "", region: "", city: "", quartier: "", notify_sms: true });
   const [agreed, setAgreed] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
-  const [ownPhoto, setOwnPhoto] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors<"full_name" | "region" | "city" | "phone" | "terms" | "form">>({});
   const [busy, setBusy] = useState(false);
 
@@ -37,11 +36,6 @@ export function ProfilePage() {
     const city = citiesOf(region).find((c) => fold(c.name) === fold(profile.city))?.name ?? (region ? "" : profile.city);
     setForm({ full_name: profile.full_name, region, city, quartier: profile.quartier ?? "", notify_sms: profile.notify_sms !== false });
   }, [profile]);
-  // GET /profile returns only the image key, so a photo URL is available just for approved providers.
-  useEffect(() => {
-    if (hasProviderTools && session) api.provider(session.sub).then((p) => setOwnPhoto(p.photo_url)).catch(() => {});
-  }, [hasProviderTools, session]);
-
   const needsTerms = !!profile && !profile.terms_accepted_at;
 
   const submit = async (event: FormEvent) => {
@@ -95,7 +89,7 @@ export function ProfilePage() {
           <div className="row" style={{ justifyContent: "flex-end" }}><Button type="submit" loading={busy}>{t("common.save")}</Button></div>
         </form>
         <aside className="card card-pad stack-sm" style={{ justifyItems: "start" }}>
-          <Avatar name={profile?.full_name} src={ownPhoto} size={72} />
+          <Avatar name={profile?.full_name} src={profile?.photo_url} size={72} />
           <strong>{profile?.full_name}</strong>
           <span className="muted small">{session?.email || formatCmPhone(session?.phone ?? "")}</span>
           {profile?.created_at && <span className="muted xs">{t("prof.member", { date: formatDate(profile.created_at) })}</span>}

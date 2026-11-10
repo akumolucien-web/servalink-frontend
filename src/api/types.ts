@@ -29,6 +29,8 @@ export interface Profile {
   quartier?: string;
   phone: string;
   profile_image_key: string | null;
+  /** Short-lived link to the user's own photo (returned by GET/PUT /profile, never sent back). */
+  photo_url?: string | null;
   language?: "fr" | "en";
   notify_sms?: boolean;
   terms_accepted_at?: string;
